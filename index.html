@@ -213,6 +213,21 @@
           Cycle <span id="cycleCurrent">0</span> / <span id="cycleTotal">0</span>
         </div>
 
+        <div class="phase-preview" id="phasePreview">
+          <div class="preview-box" data-phase="inhale">
+            <div class="label">Inhale</div>
+            <div class="value" id="previewInhale">—</div>
+          </div>
+          <div class="preview-box" data-phase="hold">
+            <div class="label">Hold</div>
+            <div class="value" id="previewHold">—</div>
+          </div>
+          <div class="preview-box" data-phase="exhale">
+            <div class="label">Exhale</div>
+            <div class="value" id="previewExhale">—</div>
+          </div>
+        </div>
+
         <div class="center-play-btn" id="centerPlayContainer">
           <button class="btn btn-primary btn-lg" id="centerPlayButton">
             <i class="bi bi-play-fill me-1"></i> Play
@@ -425,7 +440,6 @@
       currentCycle: 0,
       timeLeft: 0,
       timerId: null,
-      wheelTimerId: null,
       muted: false,
       settings: { ...DEFAULTS },
       musicAudio: new Audio(),
@@ -590,6 +604,8 @@
     }
 
     function loadSettingsFromForm() {
+      const clamp = (v) => Math.min(30, Math.max(0, Number(v) || 0));
+      const clampVolume = (v) => Math.min(100, Math.max(0, Number(v) || 0));
       const s = {
         inhaleMin: Number(inhaleMinEl.value) || 1,
         inhaleMax: Number(inhaleMaxEl.value) || 1,
@@ -717,6 +733,7 @@
       setPhaseLabel(labelText.toUpperCase());
       setTimerValue(state.timeLeft);
       setStatus(statusHint);
+      setActivePreview(['inhale','hold','exhale'].includes(phaseName) ? phaseName : null);
       playBeep();
       state.timerId = setInterval(() => {
         if (!state.isPlaying || state.isPaused) return;
@@ -724,6 +741,7 @@
         if (state.timeLeft < 0) state.timeLeft = 0;
         setTimerValue(state.timeLeft);
         if (state.timeLeft <= 0) {
+          playBeep();
           clearInterval(state.timerId);
           state.timerId = null;
           advancePhase();
@@ -753,6 +771,19 @@
       } else {
         startNextCycleOrEnd();
       }
+    }
+
+    function advancePhase() {
+      const s = state.settings;
+      const stage = state.currentStage;
+      if (!state.isPlaying) return;
+      if (stage === 'startup') { runDramaticSequence(() => startPhase('inhale', state.pendingDurations.inhale)); }
+      else if (stage === 'dramatic') { startPhase('inhale', state.pendingDurations.inhale); }
+      else if (stage === 'inhale') { startPhase('hold', state.pendingDurations.hold); }
+      else if (stage === 'hold') { startPhase('exhale', state.pendingDurations.exhale); }
+      else if (stage === 'exhale') { startBreakOrNext(); }
+      else if (stage === 'break') { startNextCycleOrEnd(); }
+      else { startNextCycleOrEnd(); }
     }
 
     function startNextCycleOrEnd() {
