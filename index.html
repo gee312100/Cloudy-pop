@@ -2,253 +2,204 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0f">
   <title>CloudyPop – Breathing Game</title>
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
-  <!-- Bootstrap Icons -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    rel="stylesheet"
-  >
-
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #000000;
+      --bg-dark: #05060c;
+      --bg-light: #f7f7fb;
+      --card-dark: rgba(0, 0, 0, 0.75);
+      --card-light: rgba(255, 255, 255, 0.8);
       --accent: #6c5ce7;
-      --accent-soft: rgba(108, 92, 231, 0.35);
+      --accent-soft: rgba(108, 92, 231, 0.18);
       --text-main: #f8f9fa;
-      --text-muted: #adb5bd;
+      --text-muted: #c6c7ce;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      --bg-image: url('https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/atl.png');
+    }
+
+    body[data-theme="light"] {
+      --bg-dark: var(--bg-light);
+      --card-dark: var(--card-light);
+      --text-main: #0b0c0f;
+      --text-muted: #4b4d56;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.15);
     }
 
     body {
       margin: 0;
       padding: 0;
-      background-color: var(--bg-dark);
+      background: var(--bg-dark);
       color: var(--text-main);
       min-height: 100vh;
       overflow: hidden;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      position: relative;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Cloud layer */
-    .cloud-layer {
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
-      overflow: hidden;
+      background: var(--bg-dark) center/cover no-repeat;
+      background-image: var(--bg-image);
+      filter: saturate(1.05);
+      opacity: 0.45;
       z-index: 0;
       pointer-events: none;
-      background: radial-gradient(circle at top, #111 0, #000 45%);
+      transition: opacity 0.4s ease;
     }
 
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.2));
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .cloud-layer { position: fixed; inset: 0; overflow: hidden; z-index: 2; pointer-events: none; }
     .cloud {
       position: absolute;
       width: 220px;
       height: 110px;
       border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 30%, #ffffffee, #ffffff66, #ffffff11);
-      filter: blur(3px);
+      background: radial-gradient(circle at 30% 30%, #ffffffee, #ffffff66, #ffffff11);
+      filter: blur(4px);
       opacity: 0.5;
-      box-shadow:
-        -40px 10px 60px #ffffff33,
-        40px -5px 80px #ffffff22;
+      box-shadow: -40px 10px 60px #ffffff33, 40px -5px 80px #ffffff22;
       animation-name: floatCloud;
       animation-timing-function: linear;
       animation-iteration-count: infinite;
     }
 
     @keyframes floatCloud {
-      from {
-        transform: translateX(-30vw) translateY(var(--startY, 0));
-      }
-      to {
-        transform: translateX(130vw) translateY(var(--endY, 0));
-      }
+      from { transform: translateX(-30vw) translateY(var(--startY, 0)); }
+      to { transform: translateX(130vw) translateY(var(--endY, 0)); }
     }
 
-    /* Foreground / Layout */
     .game-wrapper {
       position: relative;
-      z-index: 10;
+      z-index: 5;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem;
     }
 
     .game-card {
-      background: rgba(0, 0, 0, 0.7);
+      background: var(--card-dark);
       border-radius: 1.5rem;
       border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 2rem 2.5rem;
-      max-width: 520px;
+      max-width: 620px;
       width: 100%;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .game-title {
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
+    .game-title { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.85rem; color: var(--text-muted); }
+    .game-logo { font-size: 1.9rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
 
-    .game-logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
+    .badge-soft { background: var(--accent-soft); color: #fff; border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
-    .badge-soft {
-      background: var(--accent-soft);
-      color: #fff;
-      border-radius: 999px;
-      padding: 0.15rem 0.6rem;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
+    .main-display { margin: 1.25rem 0 1.5rem; text-align: center; }
+    .phase-label { font-size: 0.95rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+    .phase-label span { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .timer-value { font-size: 8rem; font-weight: 800; line-height: 1; margin-top: 0.2rem; }
+    .status-text { font-size: 0.95rem; color: var(--text-muted); margin-top: 0.35rem; min-height: 1.4em; }
+    .cycle-counter { font-size: 0.85rem; color: var(--text-muted); }
 
-    .main-display {
-      margin-top: 1.5rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
+    .center-play-btn { margin-top: 1.5rem; }
+    .center-play-btn .btn-lg { padding: 0.8rem 2.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 999px; }
 
-    .phase-label {
-      font-size: 1rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
+    .phase-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.65rem; margin-top: 1.25rem; }
+    .preview-box { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.8rem; text-align: center; transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease; }
+    .preview-box .label { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .preview-box .value { font-size: 1.6rem; font-weight: 700; margin-top: 0.15rem; }
+    .preview-box.active { transform: scale(1.1); border-color: var(--accent); background: rgba(108, 92, 231, 0.12); }
+    .preview-box.selecting { animation: pulse 0.5s ease-in-out infinite alternate; }
 
-    .phase-label span {
-      display: inline-block;
-      padding: 0.2rem 0.7rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
 
-    .timer-value {
-      font-size: 10rem;
-      font-weight: 800;
-      line-height: 1;
-      margin-top: 0.2rem;
-    }
+    .top-right-controls, .bottom-right-controls { position: fixed; z-index: 30; right: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .top-right-controls { top: 1rem; }
+    .bottom-right-controls { bottom: 1rem; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    .bottom-buttons { display: flex; gap: 0.5rem; }
+    .bottom-left-controls { position: fixed; z-index: 30; left: 1rem; bottom: 1rem; display: flex; gap: 0.5rem; }
 
-    .status-text {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
-      min-height: 1.4em;
-    }
+    .icon-btn { border-radius: 14px; border-width: 1px; padding: 0.55rem 0.7rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+    .icon-btn .bi { font-size: 1.2rem; }
 
-    .cycle-counter {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
+    .slider-stack { display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.55rem 0.65rem; border-radius: 12px; backdrop-filter: blur(10px); }
+    .slider-row { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.85rem; }
+    .slider-row input[type="range"] { width: 120px; accent-color: var(--accent); }
 
-    .center-play-btn {
-      margin-top: 1.5rem;
-    }
+    .settings-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+    .form-text { font-size: 0.8rem; color: var(--text-muted); }
 
-    .center-play-btn .btn-lg {
-      padding: 0.8rem 2.6rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-radius: 999px;
-    }
+    .section-card { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem; background: rgba(255, 255, 255, 0.03); }
+    .section-card h6 { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); }
 
-    .top-right-controls,
-    .bottom-right-controls {
-      position: fixed;
-      z-index: 20;
-      right: 1rem;
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .top-right-controls {
-      top: 1rem;
-    }
-
-    .bottom-right-controls {
-      bottom: 1rem;
-    }
-
-    .icon-btn {
-      border-radius: 999px;
-      border-width: 1px;
-      padding: 0.4rem 0.8rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
-      font-size: 0.85rem;
-    }
-
-    .icon-btn i {
-      font-size: 1.1rem;
-    }
-
-    .settings-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .form-text {
-      font-size: 0.8rem;
-    }
-
-    .game-over-text {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-top: 0.5rem;
-    }
+    .game-over-text { font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; }
 
     @media (max-width: 576px) {
-      .game-card {
-        padding: 1.5rem 1.25rem;
-      }
-      .timer-value {
-        font-size: 6rem;
-      }
+      .game-card { padding: 1.5rem 1.2rem; }
+      .timer-value { font-size: 5.2rem; }
+      .bottom-right-controls { right: 0.5rem; bottom: 0.5rem; }
+      .top-right-controls { right: 0.5rem; top: 0.5rem; }
     }
   </style>
 </head>
-<body>
-  <!-- Floating cloud background -->
+<body data-theme="dark">
+  <div class="scrim"></div>
   <div class="cloud-layer" id="cloudLayer"></div>
 
-  <!-- Settings button (top right) -->
   <div class="top-right-controls">
-    <button class="btn btn-outline-light btn-sm icon-btn" id="settingsButton" data-bs-toggle="modal" data-bs-target="#settingsModal">
+    <button class="btn btn-outline-light btn-sm icon-btn" id="settingsButton" data-bs-toggle="modal" data-bs-target="#settingsModal" aria-label="Settings">
       <i class="bi bi-gear-fill"></i>
-      <span class="d-none d-sm-inline">Settings</span>
+    </button>
+    <button class="btn btn-outline-light btn-sm icon-btn" id="themeToggle" aria-label="Toggle theme">
+      <i class="bi bi-moon-fill" id="themeToggleIcon"></i>
     </button>
   </div>
 
-  <!-- Bottom right controls: Play/Pause + Mute -->
   <div class="bottom-right-controls">
-    <button class="btn btn-outline-light btn-sm icon-btn" id="playPauseButton">
-      <i class="bi bi-play-fill" id="playPauseIcon"></i>
-      <span class="d-none d-sm-inline" id="playPauseLabel">Play</span>
-    </button>
-    <button class="btn btn-outline-light btn-sm icon-btn" id="muteButton">
-      <i class="bi bi-volume-up-fill" id="muteIcon"></i>
-    </button>
+    <div class="bottom-buttons">
+      <button class="btn btn-primary btn-sm icon-btn" id="playPauseButton" aria-label="Play or pause">
+        <i class="bi bi-play-fill" id="playPauseIcon"></i>
+      </button>
+      <button class="btn btn-outline-light btn-sm icon-btn" id="muteButton" aria-label="Mute">
+        <i class="bi bi-volume-up-fill" id="muteIcon"></i>
+      </button>
+    </div>
+    <div class="slider-stack">
+      <div class="slider-row">
+        <i class="bi bi-broadcast-pin"></i>
+        <input type="range" min="0" max="100" value="60" id="sfxSlider" aria-label="Sound effects volume">
+        <span class="small" id="sfxLabel">60%</span>
+      </div>
+      <div class="slider-row">
+        <i class="bi bi-music-note-beamed"></i>
+        <input type="range" min="0" max="100" value="50" id="musicSlider" aria-label="Music volume">
+        <span class="small" id="musicLabel">50%</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Main content -->
+  <div class="bottom-left-controls">
+    <button class="btn btn-outline-light btn-sm" id="backButton" aria-label="Go back">Back</button>
+    <button class="btn btn-outline-light btn-sm" id="skipButton" aria-label="Skip">Skip</button>
+  </div>
+
   <div class="game-wrapper">
     <div class="game-card">
       <div class="d-flex justify-content-between align-items-center">
@@ -256,8 +207,8 @@
           <div class="game-title">Breathing Game</div>
           <div class="game-logo">CloudyPop</div>
         </div>
-        <div>
-          <span class="badge-soft">Dark Mode</span>
+        <div class="text-end">
+          <span class="badge-soft" id="themeStatus">Dark Mode</span>
         </div>
       </div>
 
@@ -269,6 +220,21 @@
         <div class="status-text" id="statusText">Press Play to begin a CloudyPop cycle.</div>
         <div class="cycle-counter mt-2">
           Cycle <span id="cycleCurrent">0</span> / <span id="cycleTotal">0</span>
+        </div>
+
+        <div class="phase-preview" id="phasePreview">
+          <div class="preview-box" data-phase="inhale">
+            <div class="label">Inhale</div>
+            <div class="value" id="previewInhale">—</div>
+          </div>
+          <div class="preview-box" data-phase="hold">
+            <div class="label">Hold</div>
+            <div class="value" id="previewHold">—</div>
+          </div>
+          <div class="preview-box" data-phase="exhale">
+            <div class="label">Exhale</div>
+            <div class="value" id="previewExhale">—</div>
+          </div>
         </div>
 
         <div class="center-play-btn" id="centerPlayContainer">
@@ -287,7 +253,6 @@
     </div>
   </div>
 
-  <!-- Settings Modal -->
   <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content bg-dark text-light">
@@ -298,92 +263,137 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="settingsForm">
-            <div class="row g-3">
-              <!-- Inhale -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Inhale (seconds)</div>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Min</label>
-                    <input type="number" class="form-control form-control-sm" id="inhaleMin" value="4" min="1">
+          <form id="settingsForm" class="vstack gap-3">
+            <div class="section-card">
+              <h6 class="mb-3">Time Control</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Inhale (seconds)</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="inhaleMin" aria-label="Inhale minimum">
+                    <small class="text-muted">Min (0–30)</small>
                   </div>
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Max</label>
-                    <input type="number" class="form-control form-control-sm" id="inhaleMax" value="6" min="1">
-                  </div>
-                </div>
-                <div class="form-text">Random inhale time will be between min and max.</div>
-              </div>
-              <!-- Hold -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Hold (seconds)</div>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Min</label>
-                    <input type="number" class="form-control form-control-sm" id="holdMin" value="4" min="1">
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Max</label>
-                    <input type="number" class="form-control form-control-sm" id="holdMax" value="6" min="1">
+                  <div class="d-flex align-items-center gap-2 mt-2">
+                    <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="inhaleMax" aria-label="Inhale maximum">
+                    <small class="text-muted">Max (0–30)</small>
                   </div>
                 </div>
-                <div class="form-text">Hold your breath for a random time in this range.</div>
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Hold (seconds)</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="holdMin" aria-label="Hold minimum">
+                    <small class="text-muted">Min (0–30)</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 mt-2">
+                    <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="holdMax" aria-label="Hold maximum">
+                    <small class="text-muted">Max (0–30)</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Exhale (seconds)</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="exhaleMin" aria-label="Exhale minimum">
+                    <small class="text-muted">Min (0–30)</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 mt-2">
+                    <input type="number" min="0" max="30" value="8" class="form-control form-control-sm" id="exhaleMax" aria-label="Exhale maximum">
+                    <small class="text-muted">Max (0–30)</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Break / Rest (seconds)</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="0" max="20" value="3" class="form-range" id="breakMin">
+                    <small class="text-muted">Min: <span id="breakMinVal">3</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="0" max="30" value="6" class="form-range" id="breakMax">
+                    <small class="text-muted">Max: <span id="breakMaxVal">6</span>s</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Session start delay (seconds)</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="0" max="15" value="1" class="form-range" id="delayMin">
+                    <small class="text-muted">Min: <span id="delayMinVal">1</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="0" max="20" value="3" class="form-range" id="delayMax">
+                    <small class="text-muted">Max: <span id="delayMaxVal">3</span>s</small>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <!-- Exhale -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Exhale (seconds)</div>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Min</label>
-                    <input type="number" class="form-control form-control-sm" id="exhaleMin" value="4" min="1">
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Max</label>
-                    <input type="number" class="form-control form-control-sm" id="exhaleMax" value="8" min="1">
+            <div class="section-card">
+              <h6 class="mb-3">Cycle Control</h6>
+              <div class="settings-label mb-1">Number of cycles</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="range" min="1" max="30" value="5" class="form-range" id="cycles">
+                <strong><span id="cyclesVal">5</span></strong>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <h6 class="mb-3">Page Control</h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="settings-label mb-1">Background color</div>
+                  <input type="color" class="form-control form-control-color" id="backgroundColor" value="#05060c">
+                </div>
+                <div class="col-md-4">
+                  <div class="settings-label mb-1">Accent color</div>
+                  <input type="color" class="form-control form-control-color" id="accentColor" value="#6c5ce7">
+                </div>
+                <div class="col-md-4">
+                  <div class="settings-label mb-1">Background image URL</div>
+                  <input type="url" class="form-control form-control-sm" id="backgroundImage" placeholder="https://...">
+                </div>
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Upload background image</div>
+                  <input type="file" class="form-control form-control-sm" id="backgroundUpload" accept="image/*">
+                  <div class="form-text">Stores locally so your image is remembered.</div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mt-4">
+                    <input class="form-check-input" type="checkbox" role="switch" id="keepAwake">
+                    <label class="form-check-label" for="keepAwake">Keep screen awake during play</label>
                   </div>
                 </div>
-                <div class="form-text">Exhale time will be drawn from this range.</div>
               </div>
+            </div>
 
-              <!-- Break -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Break / Rest (seconds)</div>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Min</label>
-                    <input type="number" class="form-control form-control-sm" id="breakMin" value="3" min="0">
+            <div class="section-card">
+              <h6 class="mb-3">Music & Audio</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Select soundtrack</div>
+                  <select class="form-select form-select-sm" id="musicSelect">
+                    <option value="track1">Tech 1</option>
+                    <option value="track2">Tech 2</option>
+                    <option value="track3">Tech 3</option>
+                    <option value="track4">Tech 4</option>
+                    <option value="link">Custom link</option>
+                    <option value="upload">Upload audio</option>
+                  </select>
+                  <div class="mt-2 d-none" id="musicLinkWrapper">
+                    <input type="url" class="form-control form-control-sm" id="musicLink" placeholder="https://example.com/song.mp3">
                   </div>
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Max</label>
-                    <input type="number" class="form-control form-control-sm" id="breakMax" value="6" min="0">
+                  <div class="mt-2 d-none" id="musicUploadWrapper">
+                    <input type="file" class="form-control form-control-sm" id="musicUpload" accept="audio/*">
                   </div>
                 </div>
-                <div class="form-text">Short rest after each cycle.</div>
-              </div>
-
-              <!-- Delay before cycle -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Delay before each cycle (seconds)</div>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Min</label>
-                    <input type="number" class="form-control form-control-sm" id="delayMin" value="1" min="0">
+                <div class="col-md-6">
+                  <div class="settings-label mb-1">Volumes</div>
+                  <div class="mb-2">
+                    <label class="form-label small">Sound effects</label>
+                    <input type="range" min="0" max="100" value="60" class="form-range" id="sfxVolume">
                   </div>
-                  <div class="col-6">
-                    <label class="form-label small mb-0">Max</label>
-                    <input type="number" class="form-control form-control-sm" id="delayMax" value="3" min="0">
+                  <div>
+                    <label class="form-label small">Music</label>
+                    <input type="range" min="0" max="100" value="50" class="form-range" id="musicVolume">
                   </div>
                 </div>
-                <div class="form-text">“Get ready” time before each new cycle.</div>
-              </div>
-
-              <!-- Cycles -->
-              <div class="col-md-6">
-                <div class="settings-label mb-1">Number of cycles</div>
-                <input type="number" class="form-control form-control-sm" id="cycles" value="5" min="1">
-                <div class="form-text">Game ends when this many full cycles are completed.</div>
               </div>
             </div>
           </form>
@@ -399,135 +409,113 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
-    // ===== Local Storage Save/Load =====
-function saveSettingsToMemory() {
-  const data = {
-    inhaleMin: inhaleMinEl.value,
-    inhaleMax: inhaleMaxEl.value,
-    holdMin: holdMinEl.value,
-    holdMax: holdMaxEl.value,
-    exhaleMin: exhaleMinEl.value,
-    exhaleMax: exhaleMaxEl.value,
-    breakMin: breakMinEl.value,
-    breakMax: breakMaxEl.value,
-    delayMin: delayMinEl.value,
-    delayMax: delayMaxEl.value,
-    cycles: cyclesEl.value
-  };
-  localStorage.setItem("cloudyPopSettings", JSON.stringify(data));
-}
+    const STORAGE_KEY = 'cloudyPopSettings.v2';
+    const DEFAULTS = {
+      inhaleMin: 4,
+      inhaleMax: 6,
+      holdMin: 4,
+      holdMax: 6,
+      exhaleMin: 4,
+      exhaleMax: 8,
+      breakMin: 3,
+      breakMax: 6,
+      delayMin: 1,
+      delayMax: 3,
+      cycles: 5,
+      theme: 'dark',
+      backgroundColor: '#05060c',
+      accentColor: '#6c5ce7',
+      backgroundImage: 'https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/atl.png',
+      musicChoice: 'track1',
+      musicLink: '',
+      sfxVolume: 60,
+      musicVolume: 50,
+      keepAwake: false
+    };
 
-function loadSettingsFromMemory() {
-  const raw = localStorage.getItem("cloudyPopSettings");
-  if (!raw) return;
-  try {
-    const data = JSON.parse(raw);
-    inhaleMinEl.value = data.inhaleMin ?? inhaleMinEl.value;
-    inhaleMaxEl.value = data.inhaleMax ?? inhaleMaxEl.value;
-    holdMinEl.value = data.holdMin ?? holdMinEl.value;
-    holdMaxEl.value = data.holdMax ?? holdMaxEl.value;
-    exhaleMinEl.value = data.exhaleMin ?? exhaleMinEl.value;
-    exhaleMaxEl.value = data.exhaleMax ?? exhaleMaxEl.value;
-    breakMinEl.value = data.breakMin ?? breakMinEl.value;
-    breakMaxEl.value = data.breakMax ?? breakMaxEl.value;
-    delayMinEl.value = data.delayMin ?? delayMinEl.value;
-    delayMaxEl.value = data.delayMax ?? delayMaxEl.value;
-    cyclesEl.value = data.cycles ?? cyclesEl.value;
-  } catch(e) {
-    console.warn("Settings corrupted, using defaults.");
-  }
-}
+    const TRACKS = {
+      track1: 'https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/tech1.mp3',
+      track2: 'https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/tech2.mp3',
+      track3: 'https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/tech3.mp3',
+      track4: 'https://filebrowser-bg080ow8g44scwgksgks84k0.iconic25snaps.org/files/test/media/tech4.mp3'
+    };
 
-    // ===== Cloud generator =====
-    function createClouds() {
-      const layer = document.getElementById('cloudLayer');
-      const cloudCount = 14;
-
-      for (let i = 0; i < cloudCount; i++) {
-        const cloud = document.createElement('div');
-        cloud.className = 'cloud';
-
-        const startY = Math.random() * 80; // vh
-        const endY = startY + (Math.random() * 10 - 5);
-
-        cloud.style.setProperty('--startY', startY + 'vh');
-        cloud.style.setProperty('--endY', endY + 'vh');
-
-        const scale = 0.6 + Math.random() * 0.8;
-        cloud.style.transform = 'scale(' + scale.toFixed(2) + ')';
-        cloud.style.top = startY + 'vh';
-
-        const duration = 40 + Math.random() * 50; // seconds
-        const delay = Math.random() * -60; // negative for stagger
-        cloud.style.animationDuration = duration + 's';
-        cloud.style.animationDelay = delay + 's';
-
-        layer.appendChild(cloud);
-      }
-    }
-
-    // ===== Game state =====
     const state = {
       isPlaying: false,
       isPaused: false,
-      currentStage: null,  // "delay" | "inhale" | "hold" | "exhale" | "break"
+      currentStage: null,
       currentCycle: 0,
       timeLeft: 0,
       timerId: null,
-      wheelTimerId: null,
       muted: false,
-      settings: {
-        inhaleMin: 4,
-        inhaleMax: 6,
-        holdMin: 4,
-        holdMax: 6,
-        exhaleMin: 4,
-        exhaleMax: 8,
-        breakMin: 3,
-        breakMax: 6,
-        delayMin: 1,
-        delayMax: 3,
-        cycles: 5
-      }
+      settings: { ...DEFAULTS },
+      musicAudio: new Audio(),
+      wakeLock: null,
+      phaseHistory: [],
+      pendingDurations: { inhale: 0, hold: 0, exhale: 0 }
     };
 
-    // ===== Elements =====
-    const phaseLabelEl = document.getElementById('phaseLabel');
-    const timerValueEl = document.getElementById('timerValue');
-    const statusTextEl = document.getElementById('statusText');
-    const cycleCurrentEl = document.getElementById('cycleCurrent');
-    const cycleTotalEl = document.getElementById('cycleTotal');
-    const centerPlayContainerEl = document.getElementById('centerPlayContainer');
-    const centerPlayButtonEl = document.getElementById('centerPlayButton');
-    const gameOverContainerEl = document.getElementById('gameOverContainer');
-    const restartButtonEl = document.getElementById('restartButton');
-    const playPauseButtonEl = document.getElementById('playPauseButton');
-    const playPauseIconEl = document.getElementById('playPauseIcon');
-    const playPauseLabelEl = document.getElementById('playPauseLabel');
-    const muteButtonEl = document.getElementById('muteButton');
-    const muteIconEl = document.getElementById('muteIcon');
+    const el = (id) => document.getElementById(id);
+    const phaseLabelEl = el('phaseLabel');
+    const timerValueEl = el('timerValue');
+    const statusTextEl = el('statusText');
+    const cycleCurrentEl = el('cycleCurrent');
+    const cycleTotalEl = el('cycleTotal');
+    const centerPlayContainerEl = el('centerPlayContainer');
+    const centerPlayButtonEl = el('centerPlayButton');
+    const gameOverContainerEl = el('gameOverContainer');
+    const restartButtonEl = el('restartButton');
+    const playPauseButtonEl = el('playPauseButton');
+    const playPauseIconEl = el('playPauseIcon');
+    const muteButtonEl = el('muteButton');
+    const muteIconEl = el('muteIcon');
+    const skipButtonEl = el('skipButton');
+    const backButtonEl = el('backButton');
+    const settingsErrorEl = el('settingsError');
+    const themeToggleEl = el('themeToggle');
+    const themeToggleIconEl = el('themeToggleIcon');
+    const themeStatusEl = el('themeStatus');
+    const sfxSliderEl = el('sfxSlider');
+    const musicSliderEl = el('musicSlider');
+    const sfxLabelEl = el('sfxLabel');
+    const musicLabelEl = el('musicLabel');
 
-    const settingsErrorEl = document.getElementById('settingsError');
+    const inhaleMinEl = el('inhaleMin');
+    const inhaleMaxEl = el('inhaleMax');
+    const holdMinEl = el('holdMin');
+    const holdMaxEl = el('holdMax');
+    const exhaleMinEl = el('exhaleMin');
+    const exhaleMaxEl = el('exhaleMax');
+    const breakMinEl = el('breakMin');
+    const breakMaxEl = el('breakMax');
+    const delayMinEl = el('delayMin');
+    const delayMaxEl = el('delayMax');
+    const cyclesEl = el('cycles');
+    const breakMinValEl = el('breakMinVal');
+    const breakMaxValEl = el('breakMaxVal');
+    const delayMinValEl = el('delayMinVal');
+    const delayMaxValEl = el('delayMaxVal');
+    const cyclesValEl = el('cyclesVal');
+    const backgroundColorEl = el('backgroundColor');
+    const accentColorEl = el('accentColor');
+    const backgroundImageEl = el('backgroundImage');
+    const backgroundUploadEl = el('backgroundUpload');
+    const keepAwakeEl = el('keepAwake');
+    const musicSelectEl = el('musicSelect');
+    const musicLinkWrapperEl = el('musicLinkWrapper');
+    const musicUploadWrapperEl = el('musicUploadWrapper');
+    const musicLinkEl = el('musicLink');
+    const musicUploadEl = el('musicUpload');
 
-    // Settings inputs
-    const inhaleMinEl = document.getElementById('inhaleMin');
-    const inhaleMaxEl = document.getElementById('inhaleMax');
-    const holdMinEl = document.getElementById('holdMin');
-    const holdMaxEl = document.getElementById('holdMax');
-    const exhaleMinEl = document.getElementById('exhaleMin');
-    const exhaleMaxEl = document.getElementById('exhaleMax');
-    const breakMinEl = document.getElementById('breakMin');
-    const breakMaxEl = document.getElementById('breakMax');
-    const delayMinEl = document.getElementById('delayMin');
-    const delayMaxEl = document.getElementById('delayMax');
-    const cyclesEl = document.getElementById('cycles');
-    const saveSettingsButtonEl = document.getElementById('saveSettingsButton');
+    const previewInhaleEl = el('previewInhale');
+    const previewHoldEl = el('previewHold');
+    const previewExhaleEl = el('previewExhale');
+    const previewBoxes = document.querySelectorAll('.preview-box');
 
-    // ===== Utility =====
+    const saveSettingsButtonEl = el('saveSettingsButton');
+
     function randint(min, max) {
       min = Math.floor(min);
       max = Math.floor(max);
@@ -535,68 +523,127 @@ function loadSettingsFromMemory() {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function setPhaseLabel(text) {
-      phaseLabelEl.textContent = text;
+    function setPhaseLabel(text) { phaseLabelEl.textContent = text; }
+    function setTimerValue(val) { timerValueEl.textContent = val; }
+    function setStatus(text) { statusTextEl.textContent = text; }
+
+    function setPreviewValues(durations) {
+      if (!durations) return;
+      previewInhaleEl.textContent = durations.inhale ?? '—';
+      previewHoldEl.textContent = durations.hold ?? '—';
+      previewExhaleEl.textContent = durations.exhale ?? '—';
     }
 
-    function setTimerValue(val) {
-      timerValueEl.textContent = val;
-    }
-
-    function setStatus(text) {
-      statusTextEl.textContent = text;
+    function setActivePreview(phase) {
+      previewBoxes.forEach((box) => {
+        const isActive = box.dataset.phase === phase;
+        box.classList.toggle('active', isActive);
+        if (!phase) { box.classList.remove('active'); }
+      });
     }
 
     function clearTimers() {
-      if (state.timerId) {
-        clearInterval(state.timerId);
-        state.timerId = null;
-      }
-      if (state.wheelTimerId) {
-        clearInterval(state.wheelTimerId);
-        state.wheelTimerId = null;
-      }
+      if (state.timerId) { clearInterval(state.timerId); clearTimeout(state.timerId); state.timerId = null; }
     }
 
-    // ===== Beep sound (no audio files; using Web Audio API) =====
     function playBeep() {
-      if (state.muted) return;
+      if (state.muted || state.settings.sfxVolume === 0) return;
       try {
-        if (!playBeep.audioCtx) {
-          playBeep.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!playBeep.audioCtx) { playBeep.audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         const ctx = playBeep.audioCtx;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.type = 'square';
-        osc.frequency.value = 880; // Hz
-        gain.gain.value = 0.12;
-
+        osc.frequency.value = 880;
+        gain.gain.value = Math.max(0.01, state.settings.sfxVolume / 100) * 0.25;
         osc.connect(gain);
         gain.connect(ctx.destination);
-
         osc.start();
         osc.stop(ctx.currentTime + 0.16);
-      } catch (e) {
-        // ignore audio errors
-      }
+      } catch (e) { console.warn('Audio error', e); }
     }
 
-    // ===== Settings handling =====
+    function saveSettingsToMemory() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings)); }
+
+    function loadSettingsFromMemory() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { ...DEFAULTS };
+      try { return { ...DEFAULTS, ...JSON.parse(raw) }; }
+      catch (e) { console.warn('Unable to parse settings, using defaults', e); return { ...DEFAULTS }; }
+    }
+
+    function setTheme(theme) {
+      state.settings.theme = theme;
+      document.body.setAttribute('data-theme', theme);
+      themeToggleIconEl.className = theme === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-fill text-dark';
+      themeStatusEl.textContent = theme === 'dark' ? 'Dark Mode' : 'Light Mode';
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0a0a0f' : '#f7f7fb');
+    }
+
+    function applyStyleSettings() {
+      document.documentElement.style.setProperty('--accent', state.settings.accentColor);
+      document.documentElement.style.setProperty('--accent-soft', state.settings.accentColor + '33');
+      document.documentElement.style.setProperty('--bg-dark', state.settings.backgroundColor);
+      document.documentElement.style.setProperty('--bg-image', `url('${state.settings.backgroundImage}')`);
+      sfxSliderEl.value = state.settings.sfxVolume;
+      musicSliderEl.value = state.settings.musicVolume;
+      sfxLabelEl.textContent = state.settings.sfxVolume + '%';
+      musicLabelEl.textContent = state.settings.musicVolume + '%';
+      musicSelectEl.value = state.settings.musicChoice;
+      musicLinkEl.value = state.settings.musicLink;
+      keepAwakeEl.checked = !!state.settings.keepAwake;
+      updateMusicInputs();
+      setTheme(state.settings.theme);
+    }
+
+    function updateRangeLabels() {
+      breakMinValEl.textContent = breakMinEl.value;
+      breakMaxValEl.textContent = breakMaxEl.value;
+      delayMinValEl.textContent = delayMinEl.value;
+      delayMaxValEl.textContent = delayMaxEl.value;
+      cyclesValEl.textContent = cyclesEl.value;
+    }
+
+    function fillFormFromSettings() {
+      const s = state.settings;
+      inhaleMinEl.value = s.inhaleMin; inhaleMaxEl.value = s.inhaleMax;
+      holdMinEl.value = s.holdMin; holdMaxEl.value = s.holdMax;
+      exhaleMinEl.value = s.exhaleMin; exhaleMaxEl.value = s.exhaleMax;
+      breakMinEl.value = s.breakMin; breakMaxEl.value = s.breakMax;
+      delayMinEl.value = s.delayMin; delayMaxEl.value = s.delayMax;
+      cyclesEl.value = s.cycles;
+      backgroundColorEl.value = s.backgroundColor;
+      accentColorEl.value = s.accentColor;
+      backgroundImageEl.value = s.backgroundImage.startsWith('data:') ? '' : s.backgroundImage;
+      updateRangeLabels();
+      sfxSliderEl.value = s.sfxVolume;
+      musicSliderEl.value = s.musicVolume;
+    }
+
     function loadSettingsFromForm() {
+      const clamp = (v) => Math.min(30, Math.max(0, Number(v) || 0));
       const s = {
-        inhaleMin: Number(inhaleMinEl.value) || 1,
-        inhaleMax: Number(inhaleMaxEl.value) || 1,
-        holdMin: Number(holdMinEl.value) || 1,
-        holdMax: Number(holdMaxEl.value) || 1,
-        exhaleMin: Number(exhaleMinEl.value) || 1,
-        exhaleMax: Number(exhaleMaxEl.value) || 1,
-        breakMin: Number(breakMinEl.value) || 0,
-        breakMax: Number(breakMaxEl.value) || 0,
-        delayMin: Number(delayMinEl.value) || 0,
-        delayMax: Number(delayMaxEl.value) || 0,
-        cycles: Number(cyclesEl.value) || 1
+        inhaleMin: clamp(inhaleMinEl.value),
+        inhaleMax: clamp(inhaleMaxEl.value),
+        holdMin: clamp(holdMinEl.value),
+        holdMax: clamp(holdMaxEl.value),
+        exhaleMin: clamp(exhaleMinEl.value),
+        exhaleMax: clamp(exhaleMaxEl.value),
+        breakMin: Math.max(0, Number(breakMinEl.value) || 0),
+        breakMax: Math.max(0, Number(breakMaxEl.value) || 0),
+        delayMin: Math.max(0, Number(delayMinEl.value) || 0),
+        delayMax: Math.max(0, Number(delayMaxEl.value) || 0),
+        cycles: Math.max(1, Number(cyclesEl.value) || 1),
+        backgroundColor: backgroundColorEl.value || DEFAULTS.backgroundColor,
+        accentColor: accentColorEl.value || DEFAULTS.accentColor,
+        backgroundImage: backgroundImageEl.value || state.settings.backgroundImage || DEFAULTS.backgroundImage,
+        theme: state.settings.theme,
+        musicChoice: musicSelectEl.value,
+        musicLink: musicLinkEl.value,
+        sfxVolume: Number(sfxSliderEl.value),
+        musicVolume: Number(musicSliderEl.value),
+        keepAwake: keepAwakeEl.checked,
+        musicUpload: state.settings.musicUpload
       };
 
       const pairs = [
@@ -606,23 +653,11 @@ function loadSettingsFromMemory() {
         ['Break', s.breakMin, s.breakMax],
         ['Delay', s.delayMin, s.delayMax]
       ];
-
       for (const [name, mn, mx] of pairs) {
-        if (mn < 0 || mx < 0) {
-          settingsErrorEl.textContent = name + ' times cannot be negative.';
-          return null;
-        }
-        if (mx < mn) {
-          settingsErrorEl.textContent = name + ' max must be ≥ min.';
-          return null;
-        }
+        if (mn < 0 || mx < 0) { settingsErrorEl.textContent = name + ' values must be 0 or greater.'; return null; }
+        if (mx < mn) { settingsErrorEl.textContent = name + ' max must be greater than or equal to min.'; return null; }
       }
-
-      if (s.cycles < 1) {
-        settingsErrorEl.textContent = 'Number of cycles must be at least 1.';
-        return null;
-      }
-
+      if (s.cycles < 1) { settingsErrorEl.textContent = 'Number of cycles must be at least 1.'; return null; }
       settingsErrorEl.textContent = '';
       return s;
     }
@@ -630,90 +665,81 @@ function loadSettingsFromMemory() {
     function applySettings() {
       const newSettings = loadSettingsFromForm();
       if (!newSettings) return false;
-      state.settings = newSettings;
+      state.settings = { ...state.settings, ...newSettings };
       cycleTotalEl.textContent = state.settings.cycles;
+      applyStyleSettings();
+      attachMusic();
+      if (state.settings.keepAwake) { requestWakeLock(); }
+      else { releaseWakeLock(); }
+      if (!state.isPlaying) { generatePhaseDurations(); }
+      saveSettingsToMemory();
       return true;
     }
 
-    // ===== Wheel of fortune time picker =====
-    function spinForRandomTime(min, max, label, doneCallback) {
-      clearTimers();
-      min = Math.max(0, Math.floor(min));
-      max = Math.max(0, Math.floor(max));
-      if (max < min) [min, max] = [max, min];
-
-      const finalValue = randint(min, max);
-
-      setPhaseLabel(label.toUpperCase());
-      setStatus('Spinning for a random time…');
-      let spins = 0;
-      state.wheelTimerId = setInterval(() => {
-        spins++;
-        const fake = randint(min, max);
-        setTimerValue(fake + 's');
-
-        // Ramp up the feeling by slowing the interval after some spins
-      }, 70);
-
-      // progressively slow + end
-      setTimeout(() => {
-        clearInterval(state.wheelTimerId);
-        state.wheelTimerId = null;
-        setTimerValue(finalValue);
-        setStatus('Locking in ' + finalValue + ' seconds.');
-        setTimeout(() => {
-          doneCallback(finalValue);
-        }, 400);
-      }, 900 + Math.random() * 1000); // 0.9–1.9s spin
+    function updateMusicInputs() {
+      musicLinkWrapperEl.classList.toggle('d-none', musicSelectEl.value !== 'link');
+      musicUploadWrapperEl.classList.toggle('d-none', musicSelectEl.value !== 'upload');
     }
 
-    // ===== Timer for each phase =====
+    function attachMusic() {
+      const choice = state.settings.musicChoice;
+      let src = TRACKS[choice] || '';
+      if (choice === 'link' && state.settings.musicLink) src = state.settings.musicLink;
+      if (choice === 'upload' && state.settings.musicUpload) src = state.settings.musicUpload;
+      state.musicAudio.src = src || '';
+      state.musicAudio.loop = true;
+      state.musicAudio.volume = state.settings.musicVolume / 100;
+    }
+
+    function createClouds() {
+      const layer = document.getElementById('cloudLayer');
+      const cloudCount = 14;
+      for (let i = 0; i < cloudCount; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        const startY = Math.random() * 80;
+        const endY = startY + (Math.random() * 10 - 5);
+        cloud.style.setProperty('--startY', startY + 'vh');
+        cloud.style.setProperty('--endY', endY + 'vh');
+        const scale = 0.6 + Math.random() * 0.8;
+        cloud.style.transform = 'scale(' + scale.toFixed(2) + ')';
+        cloud.style.top = startY + 'vh';
+        const duration = 40 + Math.random() * 50;
+        const delay = Math.random() * -60;
+        cloud.style.animationDuration = duration + 's';
+        cloud.style.animationDelay = delay + 's';
+        layer.appendChild(cloud);
+      }
+    }
+
     function startPhase(phaseName, duration) {
       clearTimers();
       state.currentStage = phaseName;
       state.timeLeft = duration;
-
-      let labelText;
-      let statusHint;
-
+      state.phaseHistory.push({ phase: phaseName });
+      let labelText = 'Phase';
+      let statusHint = '';
       switch (phaseName) {
-        case 'delay':
-          labelText = 'Get Ready';
-          statusHint = 'Next cycle is about to begin.';
-          break;
-        case 'inhale':
-          labelText = 'Inhale';
-          statusHint = 'Slow deep breath in…';
-          break;
-        case 'hold':
-          labelText = 'Hold';
-          statusHint = 'Hold gently, stay relaxed.';
-          break;
-        case 'exhale':
-          labelText = 'Exhale';
-          statusHint = 'Breathe out smoothly.';
-          break;
-        case 'break':
-          labelText = 'Break';
-          statusHint = 'Rest and drift with the clouds.';
-          break;
-        default:
-          labelText = 'Phase';
-          statusHint = '';
+        case 'startup': labelText = 'Start Warning'; statusHint = 'Final warning before the race begins.'; break;
+        case 'dramatic': labelText = 'Selecting'; statusHint = 'Locking in random timers…'; break;
+        case 'delay': labelText = 'Get Ready'; statusHint = 'Next cycle is about to begin.'; break;
+        case 'inhale': labelText = 'Inhale'; statusHint = 'Slow deep breath in…'; break;
+        case 'hold': labelText = 'Hold'; statusHint = 'Hold gently, stay relaxed.'; break;
+        case 'exhale': labelText = 'Exhale'; statusHint = 'Breathe out smoothly.'; break;
+        case 'break': labelText = 'Break'; statusHint = 'Rest and drift with the clouds.'; break;
       }
-
       setPhaseLabel(labelText.toUpperCase());
       setTimerValue(state.timeLeft);
       setStatus(statusHint);
+      setActivePreview(['inhale','hold','exhale'].includes(phaseName) ? phaseName : null);
       playBeep();
-
       state.timerId = setInterval(() => {
         if (!state.isPlaying || state.isPaused) return;
         state.timeLeft -= 1;
         if (state.timeLeft < 0) state.timeLeft = 0;
         setTimerValue(state.timeLeft);
-
         if (state.timeLeft <= 0) {
+          playBeep();
           clearInterval(state.timerId);
           state.timerId = null;
           advancePhase();
@@ -721,92 +747,91 @@ function loadSettingsFromMemory() {
       }, 1000);
     }
 
-    // ===== Phase & cycle logic =====
-    function advancePhase() {
+    function runDramaticSequence(doneCallback) {
+      clearTimers();
+      state.currentStage = 'dramatic';
+      setPhaseLabel('SELECTING');
+      setStatus('Dramatic sequence underway…');
+      setTimerValue('…');
+      previewBoxes.forEach((box) => box.classList.add('selecting'));
+      setActivePreview(null);
+      setPreviewValues({ inhale: '?', hold: '?', exhale: '?' });
+      const duration = 2000 + Math.random() * 1000;
+      state.timerId = setTimeout(() => {
+        previewBoxes.forEach((box) => box.classList.remove('selecting'));
+        setPreviewValues(state.pendingDurations);
+        playBeep();
+        state.timerId = null;
+        doneCallback();
+      }, duration);
+    }
+
+    function startStartupWarning() {
+      startPhase('startup', 5);
+    }
+
+    function generatePhaseDurations() {
       const s = state.settings;
-      const stage = state.currentStage;
+      state.pendingDurations = {
+        inhale: randint(s.inhaleMin, s.inhaleMax),
+        hold: randint(s.holdMin, s.holdMax),
+        exhale: randint(s.exhaleMin, s.exhaleMax)
+      };
+      setPreviewValues(state.pendingDurations);
+    }
 
-      if (!state.isPlaying) return;
-
-      if (stage === 'delay') {
-        // After delay → Inhale
-        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (val) => {
-          startPhase('inhale', val);
-        });
-      } else if (stage === 'inhale') {
-        // Inhale → Hold
-        spinForRandomTime(s.holdMin, s.holdMax, 'Hold', (val) => {
-          startPhase('hold', val);
-        });
-      } else if (stage === 'hold') {
-        // Hold → Exhale
-        spinForRandomTime(s.exhaleMin, s.exhaleMax, 'Exhale', (val) => {
-          startPhase('exhale', val);
-        });
-      } else if (stage === 'exhale') {
-        // Exhale → Break
-        if (s.breakMax > 0) {
-          spinForRandomTime(s.breakMin, s.breakMax, 'Break', (val) => {
-            if (val === 0) {
-              // Skip trivial break
-              startNextCycleOrEnd();
-            } else {
-              startPhase('break', val);
-            }
-          });
-        } else {
-          startNextCycleOrEnd();
-        }
-      } else if (stage === 'break') {
-        // Break → Next cycle or end
-        startNextCycleOrEnd();
+    function startBreakOrNext() {
+      const s = state.settings;
+      if (s.breakMax > 0) {
+        const breakDuration = randint(s.breakMin, s.breakMax);
+        if (breakDuration === 0) { startNextCycleOrEnd(); }
+        else { startPhase('break', breakDuration); }
       } else {
         startNextCycleOrEnd();
       }
+    }
+
+    function advancePhase() {
+      const s = state.settings;
+      const stage = state.currentStage;
+      if (!state.isPlaying) return;
+      if (stage === 'startup') { runDramaticSequence(() => startPhase('inhale', state.pendingDurations.inhale)); }
+      else if (stage === 'dramatic') { startPhase('inhale', state.pendingDurations.inhale); }
+      else if (stage === 'inhale') { startPhase('hold', state.pendingDurations.hold); }
+      else if (stage === 'hold') { startPhase('exhale', state.pendingDurations.exhale); }
+      else if (stage === 'exhale') { startBreakOrNext(); }
+      else if (stage === 'break') { startNextCycleOrEnd(); }
+      else { startNextCycleOrEnd(); }
     }
 
     function startNextCycleOrEnd() {
       const s = state.settings;
-      if (state.currentCycle >= s.cycles) {
-        endGame();
-        return;
-      }
+      if (state.currentCycle >= s.cycles) { endGame(); return; }
       state.currentCycle += 1;
       cycleCurrentEl.textContent = state.currentCycle;
-
-      // Delay before cycle
-      if (s.delayMax > 0) {
-        spinForRandomTime(s.delayMin, s.delayMax, 'Get Ready', (val) => {
-          startPhase('delay', val);
-        });
-      } else {
-        // No delay → straight to inhale
-        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (val) => {
-          startPhase('inhale', val);
-        });
-      }
+      generatePhaseDurations();
+      startStartupWarning();
     }
 
     function startGame() {
       if (!applySettings()) return;
-
       clearTimers();
       state.isPlaying = true;
       state.isPaused = false;
       state.currentCycle = 0;
       state.currentStage = null;
+      state.phaseHistory = [];
       gameOverContainerEl.classList.add('d-none');
       centerPlayContainerEl.classList.add('d-none');
       cycleTotalEl.textContent = state.settings.cycles;
       cycleCurrentEl.textContent = 0;
-
       setStatus('Spinning up your first CloudyPop cycle…');
       setTimerValue('—');
       setPhaseLabel('READY');
-
+      setActivePreview(null);
+      previewBoxes.forEach((box) => box.classList.remove('selecting'));
       updatePlayPauseButton();
-
-      // Kick off cycle progression
+      startMusic();
       startNextCycleOrEnd();
     }
 
@@ -814,6 +839,7 @@ function loadSettingsFromMemory() {
       if (!state.isPlaying) return;
       state.isPaused = true;
       setStatus('Paused. Press Play to resume.');
+      state.musicAudio.pause();
       updatePlayPauseButton();
     }
 
@@ -821,6 +847,7 @@ function loadSettingsFromMemory() {
       if (!state.isPlaying) return;
       state.isPaused = false;
       setStatus('Back in the clouds.');
+      startMusic();
       updatePlayPauseButton();
     }
 
@@ -833,74 +860,212 @@ function loadSettingsFromMemory() {
       setTimerValue('0');
       gameOverContainerEl.classList.remove('d-none');
       centerPlayContainerEl.classList.remove('d-none');
+      state.musicAudio.pause();
       updatePlayPauseButton();
     }
 
     function updatePlayPauseButton() {
-      if (!state.isPlaying) {
+      if (!state.isPlaying || state.isPaused) {
         playPauseIconEl.className = 'bi bi-play-fill';
-        playPauseLabelEl.textContent = 'Play';
-        return;
-      }
-
-      if (state.isPaused) {
-        playPauseIconEl.className = 'bi bi-play-fill';
-        playPauseLabelEl.textContent = 'Resume';
+        playPauseButtonEl.classList.remove('btn-outline-light');
+        playPauseButtonEl.classList.add('btn-primary');
       } else {
         playPauseIconEl.className = 'bi bi-pause-fill';
-        playPauseLabelEl.textContent = 'Pause';
+        playPauseButtonEl.classList.add('btn-outline-light');
       }
     }
 
-    // ===== Event listeners =====
-    centerPlayButtonEl.addEventListener('click', () => {
-      startGame();
-    });
-
-    restartButtonEl.addEventListener('click', () => {
-      startGame();
-    });
-
-    playPauseButtonEl.addEventListener('click', () => {
-      if (!state.isPlaying) {
+    function skipPhase() {
+      if (!state.isPlaying) { startGame(); return; }
+      if (state.currentStage === 'break' && state.currentCycle >= state.settings.cycles) {
         startGame();
-      } else if (state.isPaused) {
-        resumeGame();
-      } else {
-        pauseGame();
+        return;
       }
-    });
+      advancePhase();
+    }
 
-    muteButtonEl.addEventListener('click', () => {
-      state.muted = !state.muted;
-      if (state.muted) {
-        muteIconEl.className = 'bi bi-volume-mute-fill';
-      } else {
-        muteIconEl.className = 'bi bi-volume-up-fill';
-        playBeep();
+    function goBackPhase() {
+      if (!state.isPlaying) { startGame(); return; }
+      switch (state.currentStage) {
+        case 'inhale':
+          startStartupWarning();
+          break;
+        case 'hold':
+          startPhase('inhale', state.pendingDurations.inhale);
+          break;
+        case 'exhale':
+          startPhase('hold', state.pendingDurations.hold);
+          break;
+        case 'break':
+          startPhase('exhale', state.pendingDurations.exhale);
+          break;
+        default:
+          startStartupWarning();
       }
-    });
+    }
 
-saveSettingsButtonEl.addEventListener('click', () => {
-  if (applySettings()) {
-    saveSettingsToMemory();  // <-- NEW
-    const modalEl = document.getElementById('settingsModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) modal.hide();
-  }
-});
+    function startMusic() {
+      state.musicAudio.volume = state.settings.musicVolume / 100;
+      if (!state.muted && state.musicAudio.src) {
+        state.musicAudio.play().catch(() => {});
+      }
+    }
 
+    function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        navigator.wakeLock.request('screen').then((lock) => {
+          state.wakeLock = lock;
+          lock.addEventListener('release', () => { if (state.settings.keepAwake) requestWakeLock(); });
+        }).catch((err) => console.warn('Wake lock failed', err));
+      }
+    }
 
-    // ===== Init =====
-window.addEventListener('DOMContentLoaded', () => {
-  createClouds();
-  loadSettingsFromMemory();  // <-- NEW
-  applySettings();
-  setPhaseLabel('READY');
-  setTimerValue('0');
-  setStatus('Press Play to begin a CloudyPop cycle.');
-});
+    function releaseWakeLock() {
+      if (state.wakeLock) { state.wakeLock.release(); state.wakeLock = null; }
+    }
 
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW registration failed', err));
+      }
+    }
+
+    function handleBackgroundUpload(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.settings.backgroundImage = e.target.result;
+        document.documentElement.style.setProperty('--bg-image', `url('${state.settings.backgroundImage}')`);
+        saveSettingsToMemory();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleMusicUpload(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.settings.musicUpload = e.target.result;
+        state.settings.musicChoice = 'upload';
+        musicSelectEl.value = 'upload';
+        attachMusic();
+        startMusic();
+        saveSettingsToMemory();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function bindEvents() {
+      [inhaleMinEl, inhaleMaxEl, holdMinEl, holdMaxEl, exhaleMinEl, exhaleMaxEl, breakMinEl, breakMaxEl, delayMinEl, delayMaxEl, cyclesEl].forEach((input) => {
+        input.addEventListener('input', updateRangeLabels);
+      });
+
+      centerPlayButtonEl.addEventListener('click', startGame);
+      restartButtonEl.addEventListener('click', startGame);
+      playPauseButtonEl.addEventListener('click', () => {
+        if (!state.isPlaying) startGame();
+        else if (state.isPaused) resumeGame();
+        else pauseGame();
+      });
+      skipButtonEl.addEventListener('click', skipPhase);
+      backButtonEl.addEventListener('click', goBackPhase);
+
+      muteButtonEl.addEventListener('click', () => {
+        state.muted = !state.muted;
+        muteIconEl.className = state.muted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill';
+        if (state.muted) state.musicAudio.pause(); else startMusic();
+      });
+
+      sfxSliderEl.addEventListener('input', () => {
+        state.settings.sfxVolume = Number(sfxSliderEl.value);
+        sfxLabelEl.textContent = state.settings.sfxVolume + '%';
+        saveSettingsToMemory();
+      });
+      musicSliderEl.addEventListener('input', () => {
+        state.settings.musicVolume = Number(musicSliderEl.value);
+        musicLabelEl.textContent = state.settings.musicVolume + '%';
+        state.musicAudio.volume = state.settings.musicVolume / 100;
+        saveSettingsToMemory();
+      });
+
+      themeToggleEl.addEventListener('click', () => {
+        const next = state.settings.theme === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+        saveSettingsToMemory();
+      });
+
+      backgroundImageEl.addEventListener('change', () => {
+        if (backgroundImageEl.value) {
+          state.settings.backgroundImage = backgroundImageEl.value;
+          document.documentElement.style.setProperty('--bg-image', `url('${state.settings.backgroundImage}')`);
+          saveSettingsToMemory();
+        }
+      });
+      backgroundUploadEl.addEventListener('change', (e) => handleBackgroundUpload(e.target.files[0]));
+
+      musicSelectEl.addEventListener('change', () => {
+        updateMusicInputs();
+        state.settings.musicChoice = musicSelectEl.value;
+        if (musicSelectEl.value !== 'upload') state.settings.musicUpload = undefined;
+        if (musicSelectEl.value !== 'link') state.settings.musicLink = '';
+        attachMusic();
+        startMusic();
+        saveSettingsToMemory();
+      });
+      musicLinkEl.addEventListener('change', () => {
+        state.settings.musicLink = musicLinkEl.value;
+        attachMusic();
+        startMusic();
+        saveSettingsToMemory();
+      });
+      musicUploadEl.addEventListener('change', (e) => handleMusicUpload(e.target.files[0]));
+
+      accentColorEl.addEventListener('input', () => {
+        state.settings.accentColor = accentColorEl.value;
+        applyStyleSettings();
+        saveSettingsToMemory();
+      });
+      backgroundColorEl.addEventListener('input', () => {
+        state.settings.backgroundColor = backgroundColorEl.value;
+        applyStyleSettings();
+        saveSettingsToMemory();
+      });
+
+      keepAwakeEl.addEventListener('change', () => {
+        state.settings.keepAwake = keepAwakeEl.checked;
+        if (state.settings.keepAwake) requestWakeLock(); else releaseWakeLock();
+        saveSettingsToMemory();
+      });
+
+      saveSettingsButtonEl.addEventListener('click', () => {
+        if (applySettings()) {
+          const modalEl = document.getElementById('settingsModal');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          if (modal) modal.hide();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && state.settings.keepAwake) { requestWakeLock(); }
+      });
+    }
+
+    function init() {
+      state.settings = loadSettingsFromMemory();
+      createClouds();
+      applyStyleSettings();
+      fillFormFromSettings();
+      updateRangeLabels();
+      generatePhaseDurations();
+      attachMusic();
+      setPhaseLabel('READY');
+      setTimerValue('0');
+      setStatus('Press Play to begin a CloudyPop cycle.');
+      registerServiceWorker();
+      bindEvents();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
