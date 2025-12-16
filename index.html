@@ -64,6 +64,16 @@
       pointer-events: none;
     }
 
+    }
+
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.2));
+      z-index: 1;
+      pointer-events: none;
+    }
+
     .cloud-layer { position: fixed; inset: 0; overflow: hidden; z-index: 2; pointer-events: none; }
     .cloud {
       position: absolute;
@@ -129,6 +139,25 @@
     .preview-box.selecting { animation: pulse 0.5s ease-in-out infinite alternate; }
 
     @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+    .top-right-controls, .bottom-right-controls { position: fixed; z-index: 30; right: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .top-right-controls { top: 1rem; }
+    .bottom-right-controls { bottom: 1rem; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    .bottom-buttons { display: flex; gap: 0.5rem; }
+    .bottom-left-controls { position: fixed; z-index: 30; left: 1rem; bottom: 1rem; display: flex; gap: 0.5rem; }
+
+    .icon-btn { border-radius: 14px; border-width: 1px; padding: 0.55rem 0.7rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+    .icon-btn .bi { font-size: 1.2rem; }
+
+    .slider-stack { display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.55rem 0.65rem; border-radius: 12px; backdrop-filter: blur(10px); }
+    .slider-row { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.85rem; }
+    .slider-row input[type="range"] { width: 120px; accent-color: var(--accent); }
+
+    .settings-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+    .form-text { font-size: 0.8rem; color: var(--text-muted); }
+
+    .section-card { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem; background: rgba(255, 255, 255, 0.03); }
+    .section-card h6 { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); }
 
     .top-right-controls, .bottom-right-controls { position: fixed; z-index: 30; right: 1rem; display: flex; align-items: center; gap: 0.5rem; }
     .top-right-controls { top: 1rem; }
@@ -276,6 +305,12 @@
                   <div class="d-flex align-items-center gap-2 mt-2">
                     <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="inhaleMax" aria-label="Inhale maximum">
                     <small class="text-muted">Max (0–30)</small>
+                    <input type="range" min="1" max="20" value="4" class="form-range" id="inhaleMin">
+                    <small class="text-muted">Min: <span id="inhaleMinVal">4</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="30" value="6" class="form-range" id="inhaleMax">
+                    <small class="text-muted">Max: <span id="inhaleMaxVal">6</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -287,6 +322,12 @@
                   <div class="d-flex align-items-center gap-2 mt-2">
                     <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="holdMax" aria-label="Hold maximum">
                     <small class="text-muted">Max (0–30)</small>
+                    <input type="range" min="1" max="20" value="4" class="form-range" id="holdMin">
+                    <small class="text-muted">Min: <span id="holdMinVal">4</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="30" value="6" class="form-range" id="holdMax">
+                    <small class="text-muted">Max: <span id="holdMaxVal">6</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -298,6 +339,12 @@
                   <div class="d-flex align-items-center gap-2 mt-2">
                     <input type="number" min="0" max="30" value="8" class="form-control form-control-sm" id="exhaleMax" aria-label="Exhale maximum">
                     <small class="text-muted">Max (0–30)</small>
+                    <input type="range" min="1" max="30" value="4" class="form-range" id="exhaleMin">
+                    <small class="text-muted">Min: <span id="exhaleMinVal">4</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="40" value="8" class="form-range" id="exhaleMax">
+                    <small class="text-muted">Max: <span id="exhaleMaxVal">8</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -305,6 +352,11 @@
                   <div class="d-flex align-items-center gap-2">
                     <input type="range" min="0" max="20" value="3" class="form-range" id="breakMin">
                     <small class="text-muted">Min: <span id="breakMinVal">3</span>s</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="0" max="30" value="6" class="form-range" id="breakMax">
+                    <small class="text-muted">Max: <span id="breakMaxVal">6</span>s</small>
+                  </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
                     <input type="range" min="0" max="30" value="6" class="form-range" id="breakMax">
@@ -455,6 +507,7 @@
       wakeLock: null,
       phaseHistory: [],
       pendingDurations: { inhale: 0, hold: 0, exhale: 0 }
+      phaseHistory: []
     };
 
     const el = (id) => document.getElementById(id);
@@ -493,6 +546,12 @@
     const delayMinEl = el('delayMin');
     const delayMaxEl = el('delayMax');
     const cyclesEl = el('cycles');
+    const inhaleMinValEl = el('inhaleMinVal');
+    const inhaleMaxValEl = el('inhaleMaxVal');
+    const holdMinValEl = el('holdMinVal');
+    const holdMaxValEl = el('holdMaxVal');
+    const exhaleMinValEl = el('exhaleMinVal');
+    const exhaleMaxValEl = el('exhaleMaxVal');
     const breakMinValEl = el('breakMinVal');
     const breakMaxValEl = el('breakMaxVal');
     const delayMinValEl = el('delayMinVal');
@@ -544,6 +603,10 @@
 
     function clearTimers() {
       if (state.timerId) { clearInterval(state.timerId); clearTimeout(state.timerId); state.timerId = null; }
+
+    function clearTimers() {
+      if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+      if (state.wheelTimerId) { clearInterval(state.wheelTimerId); state.wheelTimerId = null; }
     }
 
     function playBeep() {
@@ -597,6 +660,12 @@
     }
 
     function updateRangeLabels() {
+      inhaleMinValEl.textContent = inhaleMinEl.value;
+      inhaleMaxValEl.textContent = inhaleMaxEl.value;
+      holdMinValEl.textContent = holdMinEl.value;
+      holdMaxValEl.textContent = holdMaxEl.value;
+      exhaleMinValEl.textContent = exhaleMinEl.value;
+      exhaleMaxValEl.textContent = exhaleMaxEl.value;
       breakMinValEl.textContent = breakMinEl.value;
       breakMaxValEl.textContent = breakMaxEl.value;
       delayMinValEl.textContent = delayMinEl.value;
@@ -637,6 +706,20 @@
         backgroundColor: backgroundColorEl.value || DEFAULTS.backgroundColor,
         accentColor: accentColorEl.value || DEFAULTS.accentColor,
         backgroundImage: backgroundImageEl.value || state.settings.backgroundImage || DEFAULTS.backgroundImage,
+        inhaleMin: Number(inhaleMinEl.value) || 1,
+        inhaleMax: Number(inhaleMaxEl.value) || 1,
+        holdMin: Number(holdMinEl.value) || 1,
+        holdMax: Number(holdMaxEl.value) || 1,
+        exhaleMin: Number(exhaleMinEl.value) || 1,
+        exhaleMax: Number(exhaleMaxEl.value) || 1,
+        breakMin: Number(breakMinEl.value) || 0,
+        breakMax: Number(breakMaxEl.value) || 0,
+        delayMin: Number(delayMinEl.value) || 0,
+        delayMax: Number(delayMaxEl.value) || 0,
+        cycles: Number(cyclesEl.value) || 1,
+        backgroundColor: backgroundColorEl.value || DEFAULTS.backgroundColor,
+        accentColor: accentColorEl.value || DEFAULTS.accentColor,
+        backgroundImage: state.settings.backgroundImage || DEFAULTS.backgroundImage,
         theme: state.settings.theme,
         musicChoice: musicSelectEl.value,
         musicLink: musicLinkEl.value,
@@ -710,6 +793,27 @@
         cloud.style.animationDelay = delay + 's';
         layer.appendChild(cloud);
       }
+    }
+
+    function spinForRandomTime(min, max, label, doneCallback) {
+      clearTimers();
+      min = Math.max(0, Math.floor(min));
+      max = Math.max(0, Math.floor(max));
+      if (max < min) [min, max] = [max, min];
+      const finalValue = randint(min, max);
+      setPhaseLabel(label.toUpperCase());
+      setStatus('Spinning for a random time…');
+      state.wheelTimerId = setInterval(() => {
+        const fake = randint(min, max);
+        setTimerValue(fake + 's');
+      }, 70);
+      setTimeout(() => {
+        clearInterval(state.wheelTimerId);
+        state.wheelTimerId = null;
+        setTimerValue(finalValue);
+        setStatus('Locking in ' + finalValue + ' seconds.');
+        setTimeout(() => { doneCallback(finalValue); }, 400);
+      }, 900 + Math.random() * 1000);
     }
 
     function startPhase(phaseName, duration) {
@@ -786,6 +890,25 @@
         const breakDuration = randint(s.breakMin, s.breakMax);
         if (breakDuration === 0) { startNextCycleOrEnd(); }
         else { startPhase('break', breakDuration); }
+    function advancePhase() {
+      const s = state.settings;
+      const stage = state.currentStage;
+      if (!state.isPlaying) return;
+      if (stage === 'delay') {
+        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (v) => startPhase('inhale', v));
+      } else if (stage === 'inhale') {
+        spinForRandomTime(s.holdMin, s.holdMax, 'Hold', (v) => startPhase('hold', v));
+      } else if (stage === 'hold') {
+        spinForRandomTime(s.exhaleMin, s.exhaleMax, 'Exhale', (v) => startPhase('exhale', v));
+      } else if (stage === 'exhale') {
+        if (s.breakMax > 0) {
+          spinForRandomTime(s.breakMin, s.breakMax, 'Break', (v) => {
+            if (v === 0) { startNextCycleOrEnd(); }
+            else { startPhase('break', v); }
+          });
+        } else { startNextCycleOrEnd(); }
+      } else if (stage === 'break') {
+        startNextCycleOrEnd();
       } else {
         startNextCycleOrEnd();
       }
@@ -811,6 +934,11 @@
       cycleCurrentEl.textContent = state.currentCycle;
       generatePhaseDurations();
       startStartupWarning();
+      if (s.delayMax > 0) {
+        spinForRandomTime(s.delayMin, s.delayMax, 'Get Ready', (v) => startPhase('delay', v));
+      } else {
+        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (v) => startPhase('inhale', v));
+      }
     }
 
     function startGame() {
@@ -902,6 +1030,49 @@
         default:
           startStartupWarning();
       }
+    }
+
+    function startMusic() {
+      state.musicAudio.volume = state.settings.musicVolume / 100;
+      if (!state.muted && state.musicAudio.src) {
+        state.musicAudio.play().catch(() => {});
+      }
+    }
+
+    function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        navigator.wakeLock.request('screen').then((lock) => {
+          state.wakeLock = lock;
+          lock.addEventListener('release', () => { if (state.settings.keepAwake) requestWakeLock(); });
+        }).catch((err) => console.warn('Wake lock failed', err));
+      }
+    }
+
+    function releaseWakeLock() {
+      if (state.wakeLock) { state.wakeLock.release(); state.wakeLock = null; }
+    }
+
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW registration failed', err));
+      }
+    }
+
+      const order = ['delay', 'inhale', 'hold', 'exhale', 'break'];
+      const idx = order.indexOf(state.currentStage);
+      const s = state.settings;
+      if (idx <= 0) {
+        const dur = Math.max(1, randint(s.breakMin, s.breakMax));
+        startPhase('break', dur);
+        return;
+      }
+      const prevStage = order[idx - 1];
+      let range = [s.delayMin, s.delayMax];
+      if (prevStage === 'inhale') range = [s.inhaleMin, s.inhaleMax];
+      if (prevStage === 'hold') range = [s.holdMin, s.holdMax];
+      if (prevStage === 'exhale') range = [s.exhaleMin, s.exhaleMax];
+      if (prevStage === 'break') range = [s.breakMin, s.breakMax];
+      spinForRandomTime(range[0], range[1], prevStage, (v) => startPhase(prevStage, v));
     }
 
     function startMusic() {
