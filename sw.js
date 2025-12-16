@@ -2,7 +2,6 @@ const CACHE_NAME = 'cloudypop-cache-v1';
 const ASSETS = [
   '/',
   '/index.html',
-  '/cloudypop.html',
   '/manifest.json',
   '/icons/icon.svg'
 ];

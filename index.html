@@ -121,15 +121,6 @@
     .center-play-btn { margin-top: 1.5rem; }
     .center-play-btn .btn-lg { padding: 0.8rem 2.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 999px; }
 
-    .phase-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.65rem; margin-top: 1.25rem; }
-    .preview-box { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.8rem; text-align: center; transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease; }
-    .preview-box .label { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
-    .preview-box .value { font-size: 1.6rem; font-weight: 700; margin-top: 0.15rem; }
-    .preview-box.active { transform: scale(1.1); border-color: var(--accent); background: rgba(108, 92, 231, 0.12); }
-    .preview-box.selecting { animation: pulse 0.5s ease-in-out infinite alternate; }
-
-    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
-
     .top-right-controls, .bottom-right-controls { position: fixed; z-index: 30; right: 1rem; display: flex; align-items: center; gap: 0.5rem; }
     .top-right-controls { top: 1rem; }
     .bottom-right-controls { bottom: 1rem; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
@@ -270,34 +261,34 @@
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Inhale (seconds)</div>
                   <div class="d-flex align-items-center gap-2">
-                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="inhaleMin" aria-label="Inhale minimum">
-                    <small class="text-muted">Min (0–30)</small>
+                    <input type="range" min="1" max="20" value="4" class="form-range" id="inhaleMin">
+                    <small class="text-muted">Min: <span id="inhaleMinVal">4</span>s</small>
                   </div>
-                  <div class="d-flex align-items-center gap-2 mt-2">
-                    <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="inhaleMax" aria-label="Inhale maximum">
-                    <small class="text-muted">Max (0–30)</small>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="30" value="6" class="form-range" id="inhaleMax">
+                    <small class="text-muted">Max: <span id="inhaleMaxVal">6</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Hold (seconds)</div>
                   <div class="d-flex align-items-center gap-2">
-                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="holdMin" aria-label="Hold minimum">
-                    <small class="text-muted">Min (0–30)</small>
+                    <input type="range" min="1" max="20" value="4" class="form-range" id="holdMin">
+                    <small class="text-muted">Min: <span id="holdMinVal">4</span>s</small>
                   </div>
-                  <div class="d-flex align-items-center gap-2 mt-2">
-                    <input type="number" min="0" max="30" value="6" class="form-control form-control-sm" id="holdMax" aria-label="Hold maximum">
-                    <small class="text-muted">Max (0–30)</small>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="30" value="6" class="form-range" id="holdMax">
+                    <small class="text-muted">Max: <span id="holdMaxVal">6</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Exhale (seconds)</div>
                   <div class="d-flex align-items-center gap-2">
-                    <input type="number" min="0" max="30" value="4" class="form-control form-control-sm" id="exhaleMin" aria-label="Exhale minimum">
-                    <small class="text-muted">Min (0–30)</small>
+                    <input type="range" min="1" max="30" value="4" class="form-range" id="exhaleMin">
+                    <small class="text-muted">Min: <span id="exhaleMinVal">4</span>s</small>
                   </div>
-                  <div class="d-flex align-items-center gap-2 mt-2">
-                    <input type="number" min="0" max="30" value="8" class="form-control form-control-sm" id="exhaleMax" aria-label="Exhale maximum">
-                    <small class="text-muted">Max (0–30)</small>
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="range" min="1" max="40" value="8" class="form-range" id="exhaleMax">
+                    <small class="text-muted">Max: <span id="exhaleMaxVal">8</span>s</small>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -453,8 +444,7 @@
       settings: { ...DEFAULTS },
       musicAudio: new Audio(),
       wakeLock: null,
-      phaseHistory: [],
-      pendingDurations: { inhale: 0, hold: 0, exhale: 0 }
+      phaseHistory: []
     };
 
     const el = (id) => document.getElementById(id);
@@ -481,8 +471,6 @@
     const musicSliderEl = el('musicSlider');
     const sfxLabelEl = el('sfxLabel');
     const musicLabelEl = el('musicLabel');
-    const sfxVolumeEl = el('sfxVolume');
-    const musicVolumeEl = el('musicVolume');
 
     const inhaleMinEl = el('inhaleMin');
     const inhaleMaxEl = el('inhaleMax');
@@ -495,6 +483,12 @@
     const delayMinEl = el('delayMin');
     const delayMaxEl = el('delayMax');
     const cyclesEl = el('cycles');
+    const inhaleMinValEl = el('inhaleMinVal');
+    const inhaleMaxValEl = el('inhaleMaxVal');
+    const holdMinValEl = el('holdMinVal');
+    const holdMaxValEl = el('holdMaxVal');
+    const exhaleMinValEl = el('exhaleMinVal');
+    const exhaleMaxValEl = el('exhaleMaxVal');
     const breakMinValEl = el('breakMinVal');
     const breakMaxValEl = el('breakMaxVal');
     const delayMinValEl = el('delayMinVal');
@@ -511,11 +505,6 @@
     const musicLinkEl = el('musicLink');
     const musicUploadEl = el('musicUpload');
 
-    const previewInhaleEl = el('previewInhale');
-    const previewHoldEl = el('previewHold');
-    const previewExhaleEl = el('previewExhale');
-    const previewBoxes = document.querySelectorAll('.preview-box');
-
     const saveSettingsButtonEl = el('saveSettingsButton');
 
     function randint(min, max) {
@@ -529,23 +518,9 @@
     function setTimerValue(val) { timerValueEl.textContent = val; }
     function setStatus(text) { statusTextEl.textContent = text; }
 
-    function setPreviewValues(durations) {
-      if (!durations) return;
-      previewInhaleEl.textContent = durations.inhale ?? '—';
-      previewHoldEl.textContent = durations.hold ?? '—';
-      previewExhaleEl.textContent = durations.exhale ?? '—';
-    }
-
-    function setActivePreview(phase) {
-      previewBoxes.forEach((box) => {
-        const isActive = box.dataset.phase === phase;
-        box.classList.toggle('active', isActive);
-        if (!phase) { box.classList.remove('active'); }
-      });
-    }
-
     function clearTimers() {
-      if (state.timerId) { clearInterval(state.timerId); clearTimeout(state.timerId); state.timerId = null; }
+      if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+      if (state.wheelTimerId) { clearInterval(state.wheelTimerId); state.wheelTimerId = null; }
     }
 
     function playBeep() {
@@ -588,9 +563,7 @@
       document.documentElement.style.setProperty('--bg-dark', state.settings.backgroundColor);
       document.documentElement.style.setProperty('--bg-image', `url('${state.settings.backgroundImage}')`);
       sfxSliderEl.value = state.settings.sfxVolume;
-      sfxVolumeEl.value = state.settings.sfxVolume;
       musicSliderEl.value = state.settings.musicVolume;
-      musicVolumeEl.value = state.settings.musicVolume;
       sfxLabelEl.textContent = state.settings.sfxVolume + '%';
       musicLabelEl.textContent = state.settings.musicVolume + '%';
       musicSelectEl.value = state.settings.musicChoice;
@@ -601,6 +574,12 @@
     }
 
     function updateRangeLabels() {
+      inhaleMinValEl.textContent = inhaleMinEl.value;
+      inhaleMaxValEl.textContent = inhaleMaxEl.value;
+      holdMinValEl.textContent = holdMinEl.value;
+      holdMaxValEl.textContent = holdMaxEl.value;
+      exhaleMinValEl.textContent = exhaleMinEl.value;
+      exhaleMaxValEl.textContent = exhaleMaxEl.value;
       breakMinValEl.textContent = breakMinEl.value;
       breakMaxValEl.textContent = breakMaxEl.value;
       delayMinValEl.textContent = delayMinEl.value;
@@ -619,42 +598,34 @@
       backgroundColorEl.value = s.backgroundColor;
       accentColorEl.value = s.accentColor;
       backgroundImageEl.value = s.backgroundImage.startsWith('data:') ? '' : s.backgroundImage;
-      musicSelectEl.value = s.musicChoice;
-      musicLinkEl.value = s.musicLink;
-      keepAwakeEl.checked = !!s.keepAwake;
-      sfxVolumeEl.value = s.sfxVolume;
-      musicVolumeEl.value = s.musicVolume;
       updateRangeLabels();
       sfxSliderEl.value = s.sfxVolume;
       musicSliderEl.value = s.musicVolume;
-      sfxLabelEl.textContent = s.sfxVolume + '%';
-      musicLabelEl.textContent = s.musicVolume + '%';
-      updateMusicInputs();
     }
 
     function loadSettingsFromForm() {
       const clamp = (v) => Math.min(30, Math.max(0, Number(v) || 0));
       const clampVolume = (v) => Math.min(100, Math.max(0, Number(v) || 0));
       const s = {
-        inhaleMin: clamp(inhaleMinEl.value),
-        inhaleMax: clamp(inhaleMaxEl.value),
-        holdMin: clamp(holdMinEl.value),
-        holdMax: clamp(holdMaxEl.value),
-        exhaleMin: clamp(exhaleMinEl.value),
-        exhaleMax: clamp(exhaleMaxEl.value),
-        breakMin: Math.max(0, Number(breakMinEl.value) || 0),
-        breakMax: Math.max(0, Number(breakMaxEl.value) || 0),
-        delayMin: Math.max(0, Number(delayMinEl.value) || 0),
-        delayMax: Math.max(0, Number(delayMaxEl.value) || 0),
-        cycles: Math.max(1, Number(cyclesEl.value) || 1),
+        inhaleMin: Number(inhaleMinEl.value) || 1,
+        inhaleMax: Number(inhaleMaxEl.value) || 1,
+        holdMin: Number(holdMinEl.value) || 1,
+        holdMax: Number(holdMaxEl.value) || 1,
+        exhaleMin: Number(exhaleMinEl.value) || 1,
+        exhaleMax: Number(exhaleMaxEl.value) || 1,
+        breakMin: Number(breakMinEl.value) || 0,
+        breakMax: Number(breakMaxEl.value) || 0,
+        delayMin: Number(delayMinEl.value) || 0,
+        delayMax: Number(delayMaxEl.value) || 0,
+        cycles: Number(cyclesEl.value) || 1,
         backgroundColor: backgroundColorEl.value || DEFAULTS.backgroundColor,
         accentColor: accentColorEl.value || DEFAULTS.accentColor,
-        backgroundImage: backgroundImageEl.value || state.settings.backgroundImage || DEFAULTS.backgroundImage,
+        backgroundImage: state.settings.backgroundImage || DEFAULTS.backgroundImage,
         theme: state.settings.theme,
         musicChoice: musicSelectEl.value,
         musicLink: musicLinkEl.value,
-        sfxVolume: clampVolume(sfxVolumeEl.value),
-        musicVolume: clampVolume(musicVolumeEl.value),
+        sfxVolume: Number(sfxSliderEl.value),
+        musicVolume: Number(musicSliderEl.value),
         keepAwake: keepAwakeEl.checked,
         musicUpload: state.settings.musicUpload
       };
@@ -681,15 +652,10 @@
       state.settings = { ...state.settings, ...newSettings };
       cycleTotalEl.textContent = state.settings.cycles;
       applyStyleSettings();
-      fillFormFromSettings();
       attachMusic();
-      if (state.isPlaying && !state.isPaused && !state.muted) { startMusic(); }
-      else { state.musicAudio.pause(); }
       if (state.settings.keepAwake) { requestWakeLock(); }
       else { releaseWakeLock(); }
-      generatePhaseDurations();
       saveSettingsToMemory();
-      settingsErrorEl.textContent = '';
       return true;
     }
 
@@ -729,6 +695,27 @@
       }
     }
 
+    function spinForRandomTime(min, max, label, doneCallback) {
+      clearTimers();
+      min = Math.max(0, Math.floor(min));
+      max = Math.max(0, Math.floor(max));
+      if (max < min) [min, max] = [max, min];
+      const finalValue = randint(min, max);
+      setPhaseLabel(label.toUpperCase());
+      setStatus('Spinning for a random time…');
+      state.wheelTimerId = setInterval(() => {
+        const fake = randint(min, max);
+        setTimerValue(fake + 's');
+      }, 70);
+      setTimeout(() => {
+        clearInterval(state.wheelTimerId);
+        state.wheelTimerId = null;
+        setTimerValue(finalValue);
+        setStatus('Locking in ' + finalValue + ' seconds.');
+        setTimeout(() => { doneCallback(finalValue); }, 400);
+      }, 900 + Math.random() * 1000);
+    }
+
     function startPhase(phaseName, duration) {
       clearTimers();
       state.currentStage = phaseName;
@@ -737,8 +724,6 @@
       let labelText = 'Phase';
       let statusHint = '';
       switch (phaseName) {
-        case 'startup': labelText = 'Start Warning'; statusHint = 'Final warning before the race begins.'; break;
-        case 'dramatic': labelText = 'Selecting'; statusHint = 'Locking in random timers…'; break;
         case 'delay': labelText = 'Get Ready'; statusHint = 'Next cycle is about to begin.'; break;
         case 'inhale': labelText = 'Inhale'; statusHint = 'Slow deep breath in…'; break;
         case 'hold': labelText = 'Hold'; statusHint = 'Hold gently, stay relaxed.'; break;
@@ -764,45 +749,25 @@
       }, 1000);
     }
 
-    function runDramaticSequence(doneCallback) {
-      clearTimers();
-      state.currentStage = 'dramatic';
-      setPhaseLabel('SELECTING');
-      setStatus('Dramatic sequence underway…');
-      setTimerValue('…');
-      previewBoxes.forEach((box) => box.classList.add('selecting'));
-      setActivePreview(null);
-      setPreviewValues({ inhale: '?', hold: '?', exhale: '?' });
-      const duration = 2000 + Math.random() * 1000;
-      state.timerId = setTimeout(() => {
-        previewBoxes.forEach((box) => box.classList.remove('selecting'));
-        setPreviewValues(state.pendingDurations);
-        playBeep();
-        state.timerId = null;
-        doneCallback();
-      }, duration);
-    }
-
-    function startStartupWarning() {
-      startPhase('startup', 5);
-    }
-
-    function generatePhaseDurations() {
+    function advancePhase() {
       const s = state.settings;
-      state.pendingDurations = {
-        inhale: randint(s.inhaleMin, s.inhaleMax),
-        hold: randint(s.holdMin, s.holdMax),
-        exhale: randint(s.exhaleMin, s.exhaleMax)
-      };
-      setPreviewValues(state.pendingDurations);
-    }
-
-    function startBreakOrNext() {
-      const s = state.settings;
-      if (s.breakMax > 0) {
-        const breakDuration = randint(s.breakMin, s.breakMax);
-        if (breakDuration === 0) { startNextCycleOrEnd(); }
-        else { startPhase('break', breakDuration); }
+      const stage = state.currentStage;
+      if (!state.isPlaying) return;
+      if (stage === 'delay') {
+        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (v) => startPhase('inhale', v));
+      } else if (stage === 'inhale') {
+        spinForRandomTime(s.holdMin, s.holdMax, 'Hold', (v) => startPhase('hold', v));
+      } else if (stage === 'hold') {
+        spinForRandomTime(s.exhaleMin, s.exhaleMax, 'Exhale', (v) => startPhase('exhale', v));
+      } else if (stage === 'exhale') {
+        if (s.breakMax > 0) {
+          spinForRandomTime(s.breakMin, s.breakMax, 'Break', (v) => {
+            if (v === 0) { startNextCycleOrEnd(); }
+            else { startPhase('break', v); }
+          });
+        } else { startNextCycleOrEnd(); }
+      } else if (stage === 'break') {
+        startNextCycleOrEnd();
       } else {
         startNextCycleOrEnd();
       }
@@ -826,8 +791,11 @@
       if (state.currentCycle >= s.cycles) { endGame(); return; }
       state.currentCycle += 1;
       cycleCurrentEl.textContent = state.currentCycle;
-      generatePhaseDurations();
-      startStartupWarning();
+      if (s.delayMax > 0) {
+        spinForRandomTime(s.delayMin, s.delayMax, 'Get Ready', (v) => startPhase('delay', v));
+      } else {
+        spinForRandomTime(s.inhaleMin, s.inhaleMax, 'Inhale', (v) => startPhase('inhale', v));
+      }
     }
 
     function startGame() {
@@ -845,8 +813,6 @@
       setStatus('Spinning up your first CloudyPop cycle…');
       setTimerValue('—');
       setPhaseLabel('READY');
-      setActivePreview(null);
-      previewBoxes.forEach((box) => box.classList.remove('selecting'));
       updatePlayPauseButton();
       startMusic();
       startNextCycleOrEnd();
@@ -903,22 +869,21 @@
 
     function goBackPhase() {
       if (!state.isPlaying) { startGame(); return; }
-      switch (state.currentStage) {
-        case 'inhale':
-          startStartupWarning();
-          break;
-        case 'hold':
-          startPhase('inhale', state.pendingDurations.inhale);
-          break;
-        case 'exhale':
-          startPhase('hold', state.pendingDurations.hold);
-          break;
-        case 'break':
-          startPhase('exhale', state.pendingDurations.exhale);
-          break;
-        default:
-          startStartupWarning();
+      const order = ['delay', 'inhale', 'hold', 'exhale', 'break'];
+      const idx = order.indexOf(state.currentStage);
+      const s = state.settings;
+      if (idx <= 0) {
+        const dur = Math.max(1, randint(s.breakMin, s.breakMax));
+        startPhase('break', dur);
+        return;
       }
+      const prevStage = order[idx - 1];
+      let range = [s.delayMin, s.delayMax];
+      if (prevStage === 'inhale') range = [s.inhaleMin, s.inhaleMax];
+      if (prevStage === 'hold') range = [s.holdMin, s.holdMax];
+      if (prevStage === 'exhale') range = [s.exhaleMin, s.exhaleMax];
+      if (prevStage === 'break') range = [s.breakMin, s.breakMax];
+      spinForRandomTime(range[0], range[1], prevStage, (v) => startPhase(prevStage, v));
     }
 
     function startMusic() {
@@ -975,12 +940,6 @@
     function bindEvents() {
       [inhaleMinEl, inhaleMaxEl, holdMinEl, holdMaxEl, exhaleMinEl, exhaleMaxEl, breakMinEl, breakMaxEl, delayMinEl, delayMaxEl, cyclesEl].forEach((input) => {
         input.addEventListener('input', updateRangeLabels);
-      });
-
-      const settingsModalEl = document.getElementById('settingsModal');
-      settingsModalEl.addEventListener('show.bs.modal', () => {
-        settingsErrorEl.textContent = '';
-        fillFormFromSettings();
       });
 
       centerPlayButtonEl.addEventListener('click', startGame);
@@ -1079,7 +1038,6 @@
       applyStyleSettings();
       fillFormFromSettings();
       updateRangeLabels();
-      generatePhaseDurations();
       attachMusic();
       setPhaseLabel('READY');
       setTimerValue('0');
