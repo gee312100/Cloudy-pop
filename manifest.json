@@ -1,0 +1,11 @@
+{
+  "name": "CloudyPop Breathing Game",
+  "short_name": "CloudyPop",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#05060c",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
