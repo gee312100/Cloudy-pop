@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 session_start();
 
+set_exception_handler(function (Throwable $exception): void {
+    error_log('[cloudypop] Unhandled exception: ' . $exception->getMessage());
+    json_response(['ok' => false, 'error' => 'Server error.'], 500);
+});
+
 function env_value(string $key, ?string $default = null): ?string
 {
     $value = getenv($key);
