@@ -1,53 +1,120 @@
-# CloudyPop
+# GOON//CONTROL – Cloudy Pop Rebuild
 
-CloudyPop is a progressive web app (PWA) breathing game with dramatic inhale/hold/exhale reveals, audio cues, and customizable theming. The app runs entirely in the browser (or as an installable PWA) and remembers your preferences between sessions.
+This repository has been rebuilt from scratch as a PHP + MariaDB real-time command game. It delivers a dramatic animated entry sequence, a master/sub control flow, and backend endpoints for authentication, access logs, suspension controls, command queues, and lightweight WebRTC signaling.
 
-## Features
-- Installable PWA with offline caching and maskable SVG icon.
-- Light/dark theme toggle with sun/moon indicator, accent and background customization, and optional wake-lock while playing.
-- Game loop with startup warning, dramatic timer reveal, randomized inhale/hold/exhale durations, per-phase beeps, and cycle/back/skip controls.
-- Settings grouped into Time, Cycle, Page, and Music & Audio sections with persistent storage and immediate application on save.
-- Music selection from bundled tracks, custom links, or uploads, plus independent sliders for music and sound effects.
+## Stack overview
+- **Frontend:** HTML5, modern CSS animations, and vanilla ES modules (`public/`).
+- **Backend:** PHP 8.3 with Apache and PDO MySQL (`api/`).
+- **Database:** MariaDB 11 with a schema initializer (`db/schema.sql`).
+- **Container runtime:** Dockerfile-based build (ideal for Coolify) plus `docker-compose.yml` for local development.
 
-## Running locally
-1. Serve the static files from the repo root so the service worker and manifest load correctly:
-   ```bash
-   python -m http.server 8000
-   # then open http://localhost:8000
-   ```
-2. Add the PWA to your device from the browser's install option if desired.
+## Key gameplay flow implemented
+1. **Animated entry:** Sky-blue scene with sun, a lightbulb reveal, then a hard cut to black as angry clouds sweep in and slam the title `GOON//CONTROL`.
+2. **Auth gate:** Email + password signup/login.
+3. **Role select:**
+   - **Master //** creates a 6-digit code.
+   - **Sub //** enters that code, must accept webcam + mic permissions, and lands on a black “establishing connection” screen.
+4. **Realtime controls:**
+   - Master can queue and broadcast `Inhale`, `Hold`, and `Break` timers.
+   - Surprise countdown commands.
+   - Master chat appears on the sub screen.
+   - Commands can be saved and re-applied as named sequences.
 
-## Docker
-Build and run a containerized copy with Nginx:
-```bash
-docker build -t cloudypop .
-docker run -p 8080:8080 cloudypop
-# open http://localhost:8080
-```
-The bundled Nginx config serves `index.html` at the root scope so the service worker and manifest register correctly.
+> Note: WebRTC is implemented with polling-based signaling endpoints. For production scale or multiple concurrent subs per master, you should move signaling to WebSockets and add TURN infrastructure.
 
-## Controls and settings
-- **Top right:** Settings gear, light/dark toggle.
-- **Bottom left:** Back (previous stage) and Skip (next stage or restart after last break).
-- **Bottom right:** Play/Pause, Mute, sliders for SFX and music volumes.
-- **Settings modal:**
-  - Time Control: 0–30s number inputs for inhale/hold/exhale, ranges for break/rest and session delay.
-  - Cycle Control: number of cycles.
-  - Page Control: background color/image upload or link, accent color, wake-lock toggle.
-  - Music & Audio: choose bundled tracks, custom link, or upload; volume sliders for music and sound effects.
-
-Saving settings immediately applies them, refreshes the preview values, and stores them in localStorage so they are restored on reload.
-
-## Testing
-- Validate manifest formatting:
-  ```bash
-  python -m json.tool manifest.json
-  ```
-- (Optional) Run HTML checks such as `npx --yes htmlhint index.html` if your environment allows external package installs.
+---
 
 ## Project layout
-- `index.html` – main PWA and game logic.
-- `manifest.json` – PWA metadata.
-- `sw.js` – service worker cache.
-- `icons/icon.svg` – maskable app icon.
-- `Dockerfile`, `nginx.conf`, `.dockerignore` – container packaging.
+- `public/index.html` – entry animation, auth, master/sub UI.
+- `public/styles.css` – full visual system and animations.
+- `public/app.js` – client state, API integration, queueing, polling, and WebRTC signaling.
+- `api/*.php` – JSON endpoints for auth, sessions, commands, chat, sequences, signaling, and admin suspension.
+- `db/schema.sql` – MariaDB schema.
+- `Dockerfile` – PHP 8.3 Apache build targeting `public/` as the document root.
+- `docker-compose.yml` – local app + database orchestration.
+- `docs/coolify.md` – Coolify-specific deployment instructions.
+
+---
+
+## Local development with Docker Compose
+
+### 1) Start the stack
+```bash
+docker compose up --build
+```
+
+The app will be available at:
+- http://localhost:8080
+
+The database will be available at:
+- Host: `127.0.0.1`
+- Port: `3307`
+- Database: `cloudypop`
+- User: `cloudypop`
+- Password: `cloudypop`
+
+### 2) Initialize the database
+The schema is mounted automatically into `/docker-entrypoint-initdb.d/` and will run on first boot of the database container.
+
+If you need to reset the schema:
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+---
+
+## Environment variables
+The PHP API reads the following variables:
+
+```bash
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=cloudypop
+DB_USER=cloudypop
+DB_PASS=cloudypop
+```
+
+Copy `.env.example` if you want to manage these explicitly:
+```bash
+cp .env.example .env
+```
+
+---
+
+## Admin suspension workflow
+Suspension is handled via the `users.suspended` flag and enforced by `require_auth()`.
+
+To suspend a user you must:
+1. Promote a user to admin in the database:
+   ```sql
+   UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
+   ```
+2. Call the admin endpoint:
+   - `POST /api/admin-suspend.php`
+   - Body:
+     ```json
+     { "user_id": 42, "suspended": 1 }
+     ```
+
+All key events (login, session creation, command polling, etc.) are stored in `access_logs`.
+
+---
+
+## Deployment on Coolify
+Coolify works best with the Dockerfile approach in this repo. Follow the full guide here:
+
+👉 `docs/coolify.md`
+
+---
+
+## API surface (high-level)
+- Auth: `/api/signup.php`, `/api/login.php`, `/api/logout.php`, `/api/me.php`
+- Sessions: `/api/create-session.php`, `/api/join-session.php`
+- Commands: `/api/send-command.php`, `/api/fetch-commands.php`
+- Chat: `/api/post-chat.php`, `/api/fetch-chats.php`
+- Sequences: `/api/save-sequence.php`, `/api/list-sequences.php`, `/api/apply-sequence.php`
+- WebRTC signaling: `/api/post-signal.php`, `/api/fetch-signals.php`
+- Admin: `/api/admin-suspend.php`
+
+All endpoints expect and return JSON.
