@@ -82,10 +82,6 @@ function showMessage(target, message, tone = "info") {
   target.style.color = tone === "error" ? "var(--danger)" : "var(--accent-strong)";
 }
 
-function looksLikeHtml(text) {
-  return /<\s*(!doctype|html|head|body|br|p|div)\b/i.test(text);
-}
-
 async function apiFetch(path, options = {}) {
   const response = await fetch(path, {
     credentials: "include",
@@ -95,17 +91,6 @@ async function apiFetch(path, options = {}) {
     },
     ...options,
   });
-
-  const contentType = response.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-
-  if (!isJson) {
-    const text = await response.text();
-    const hint = looksLikeHtml(text)
-      ? "Server returned HTML instead of JSON. This usually means the API crashed (often a DB connection/config issue)."
-      : `Unexpected response type: ${contentType || "unknown"}.`;
-    throw new Error(hint);
-  }
 
   const data = await response.json().catch(() => ({ ok: false, error: "Invalid server response." }));
   if (!response.ok || data.ok === false) {
