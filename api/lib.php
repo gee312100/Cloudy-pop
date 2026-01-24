@@ -116,16 +116,20 @@ function request_user_agent(): string
 
 function log_action(?int $userId, string $action, ?array $details = null): void
 {
-    $stmt = pdo()->prepare(
-        'INSERT INTO access_logs (user_id, action, ip_address, user_agent, details) VALUES (:user_id, :action, :ip, :ua, :details)'
-    );
-    $stmt->execute([
-        'user_id' => $userId,
-        'action' => $action,
-        'ip' => request_ip(),
-        'ua' => request_user_agent(),
-        'details' => $details ? json_encode($details, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : null,
-    ]);
+    try {
+        $stmt = pdo()->prepare(
+            'INSERT INTO access_logs (user_id, action, ip_address, user_agent, details) VALUES (:user_id, :action, :ip, :ua, :details)'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'action' => $action,
+            'ip' => request_ip(),
+            'ua' => request_user_agent(),
+            'details' => $details ? json_encode($details, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : null,
+        ]);
+    } catch (PDOException $exception) {
+        error_log('[cloudypop] Failed to write access log: ' . $exception->getMessage());
+    }
 }
 
 function ensure_not_suspended(array $user): void
