@@ -24,19 +24,61 @@ function pdo(): PDO
         return $pdo;
     }
 
-    $host = env_value('DB_HOST', 'db');
-    $port = env_value('DB_PORT', '3306');
     $name = env_value('DB_NAME', 'cloudypop');
     $user = env_value('DB_USER', 'cloudypop');
     $pass = env_value('DB_PASS', 'cloudypop');
 
-    $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $name);
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $candidates = [];
+    $envHost = env_value('DB_HOST');
+    $envPort = env_value('DB_PORT');
+    if ($envHost !== null || $envPort !== null) {
+        $candidates[] = [
+            'host' => $envHost ?? '127.0.0.1',
+            'port' => $envPort ?? '3306',
+        ];
+    }
 
-    return $pdo;
+    $fallbacks = [
+        ['host' => 'db', 'port' => '3306'],
+        ['host' => '127.0.0.1', 'port' => '3307'],
+        ['host' => '127.0.0.1', 'port' => '3306'],
+    ];
+
+    foreach ($fallbacks as $fallback) {
+        $key = $fallback['host'] . ':' . $fallback['port'];
+        $seen = false;
+        foreach ($candidates as $candidate) {
+            if (($candidate['host'] . ':' . $candidate['port']) === $key) {
+                $seen = true;
+                break;
+            }
+        }
+        if (!$seen) {
+            $candidates[] = $fallback;
+        }
+    }
+
+    $lastError = null;
+    foreach ($candidates as $candidate) {
+        $dsn = sprintf(
+            'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
+            $candidate['host'],
+            $candidate['port'],
+            $name
+        );
+        try {
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+            return $pdo;
+        } catch (PDOException $exception) {
+            $lastError = $exception;
+            error_log(sprintf('[cloudypop] DB connection failed for %s:%s: %s', $candidate['host'], $candidate['port'], $exception->getMessage()));
+        }
+    }
+
+    throw $lastError ?? new RuntimeException('Unable to connect to database.');
 }
 
 function json_response(array $data, int $status = 200): void
