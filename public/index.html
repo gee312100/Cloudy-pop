@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GOON//CONTROL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="entry-overlay" class="entry-overlay" aria-hidden="true">
+      <div class="entry-stage entry-stage--sky">
+        <div class="sun"></div>
+        <div class="sun-glow"></div>
+      </div>
+      <div class="entry-stage entry-stage--bulb">
+        <div class="bulb">
+          <div class="bulb-core"></div>
+        </div>
+      </div>
+      <div class="entry-stage entry-stage--clouds">
+        <div class="cloud cloud--one"></div>
+        <div class="cloud cloud--two"></div>
+        <div class="cloud cloud--three"></div>
+        <div class="slam-text">GOON//CONTROL</div>
+      </div>
+    </div>
+
+    <main class="app">
+      <header class="app__header">
+        <div class="brand">GOON//CONTROL</div>
+        <button id="logout-btn" class="btn btn--ghost hidden" type="button">Logout</button>
+      </header>
+
+      <section id="auth-panel" class="panel panel--auth">
+        <div class="panel__header">
+          <h1>Enter the storm</h1>
+          <p>Master the breath. Command the clouds.</p>
+        </div>
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab is-active" data-tab="login" type="button" role="tab" aria-selected="true">
+            Login
+          </button>
+          <button class="auth-tab" data-tab="signup" type="button" role="tab" aria-selected="false">
+            Signup
+          </button>
+        </div>
+        <form id="login-form" class="auth-form is-active" autocomplete="on">
+          <label>
+            Email
+            <input name="email" type="email" required placeholder="you@domain.com" />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" required minlength="8" placeholder="••••••••" />
+          </label>
+          <button class="btn btn--primary" type="submit">Login</button>
+        </form>
+        <form id="signup-form" class="auth-form" autocomplete="on">
+          <label>
+            Email
+            <input name="email" type="email" required placeholder="you@domain.com" />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" required minlength="8" placeholder="8+ characters" />
+          </label>
+          <button class="btn btn--primary" type="submit">Create account</button>
+        </form>
+        <p id="auth-message" class="panel__message" role="status"></p>
+      </section>
+
+      <section id="mode-panel" class="panel hidden">
+        <div class="panel__header">
+          <h2>Choose your role</h2>
+          <p>Master drives the ritual. Sub follows the command stream.</p>
+        </div>
+        <div class="mode-actions">
+          <button id="master-btn" class="btn btn--primary btn--wide" type="button">Master //</button>
+          <button id="sub-btn" class="btn btn--outline btn--wide" type="button">Sub //</button>
+        </div>
+        <div id="sub-join" class="sub-join hidden">
+          <label>
+            Enter master code
+            <input id="sub-code" type="text" inputmode="numeric" maxlength="6" placeholder="123456" />
+          </label>
+          <button id="sub-connect" class="btn btn--primary" type="button">Connect</button>
+          <p class="sub-join__hint">Sub mode requires webcam + mic permission.</p>
+        </div>
+        <p id="mode-message" class="panel__message" role="status"></p>
+      </section>
+
+      <section id="sub-panel" class="panel panel--sub hidden">
+        <div class="sub-screen">
+          <div class="sub-screen__status">
+            <p class="sub-screen__label">establishing connection</p>
+            <div class="pulse-dot" aria-hidden="true"></div>
+            <p id="sub-phase" class="sub-screen__phase">Awaiting master</p>
+            <p id="sub-timer" class="sub-screen__timer">--</p>
+          </div>
+          <div id="surprise-overlay" class="surprise-overlay hidden" aria-live="assertive">
+            <p class="surprise-overlay__title">SURPRISE</p>
+            <p id="surprise-message" class="surprise-overlay__message"></p>
+            <p id="surprise-countdown" class="surprise-overlay__countdown"></p>
+          </div>
+          <div class="sub-screen__media">
+            <div class="video-frame">
+              <video id="sub-remote" autoplay playsinline></video>
+              <div class="video-frame__label">master feed</div>
+            </div>
+            <div class="video-frame video-frame--self">
+              <video id="sub-local" autoplay playsinline muted></video>
+              <div class="video-frame__label">your cam</div>
+            </div>
+          </div>
+        </div>
+        <div id="sub-chat" class="chat-stream"></div>
+      </section>
+
+      <section id="master-panel" class="panel panel--master hidden">
+        <div class="master-grid">
+          <aside class="master-card">
+            <div class="card__header">
+              <h2>Session control</h2>
+              <p class="card__sub">Share this code with your sub.</p>
+            </div>
+            <div class="session-code" id="session-code">------</div>
+            <button id="copy-code" class="btn btn--ghost" type="button">Copy code</button>
+            <div class="queue">
+              <div class="queue__header">
+                <h3>Command queue</h3>
+                <button id="send-queue" class="btn btn--primary btn--small" type="button">Broadcast queue</button>
+              </div>
+              <ul id="queue-list" class="queue__list"></ul>
+            </div>
+          </aside>
+
+          <div class="master-card master-card--wide">
+            <div class="card__header">
+              <h2>Breath timers</h2>
+              <p class="card__sub">Stack timers and send them as a timed wave.</p>
+            </div>
+            <div class="timer-controls">
+              <div class="timer-control">
+                <label>Inhale seconds</label>
+                <input id="inhale-duration" type="number" min="1" max="120" value="10" />
+                <button class="btn btn--outline" data-phase="Inhale" type="button">Queue inhale</button>
+              </div>
+              <div class="timer-control">
+                <label>Hold seconds</label>
+                <input id="hold-duration" type="number" min="1" max="120" value="8" />
+                <button class="btn btn--outline" data-phase="Hold" type="button">Queue hold</button>
+              </div>
+              <div class="timer-control">
+                <label>Break seconds</label>
+                <input id="break-duration" type="number" min="1" max="120" value="12" />
+                <button class="btn btn--outline" data-phase="Break" type="button">Queue break</button>
+              </div>
+            </div>
+            <div class="sequence">
+              <div class="sequence__row">
+                <input id="sequence-name" type="text" maxlength="120" placeholder="Name this sequence" />
+                <button id="save-sequence" class="btn btn--ghost" type="button">Save sequence</button>
+              </div>
+              <div class="sequence__row">
+                <select id="sequence-select">
+                  <option value="">Load saved sequence</option>
+                </select>
+                <button id="apply-sequence" class="btn btn--outline" type="button">Apply</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="master-card">
+            <div class="card__header">
+              <h2>Surprise</h2>
+              <p class="card__sub">Fire a countdown command with a custom prompt.</p>
+            </div>
+            <label>
+              Prompt
+              <input id="surprise-text" type="text" maxlength="160" placeholder="Drop and give me 20" />
+            </label>
+            <label>
+              Countdown seconds
+              <input id="surprise-duration" type="number" min="3" max="180" value="15" />
+            </label>
+            <button id="send-surprise" class="btn btn--primary" type="button">Send surprise</button>
+          </div>
+
+          <div class="master-card">
+            <div class="card__header">
+              <h2>Live view</h2>
+              <p class="card__sub">Preview, broadcast, and watch the return feed.</p>
+            </div>
+            <div class="video-frame">
+              <video id="master-local" autoplay playsinline muted></video>
+              <div class="video-frame__label">your cam</div>
+            </div>
+            <div class="video-frame">
+              <video id="master-remote" autoplay playsinline></video>
+              <div class="video-frame__label">sub feed</div>
+            </div>
+            <div class="video-actions">
+              <button id="preview-cam" class="btn btn--outline" type="button">View webcam</button>
+              <button id="broadcast-cam" class="btn btn--primary" type="button">Broadcast webcam</button>
+            </div>
+          </div>
+
+          <div class="master-card master-card--wide">
+            <div class="card__header">
+              <h2>Command chat</h2>
+              <p class="card__sub">Messages appear on the sub screen.</p>
+            </div>
+            <div id="master-chat-stream" class="chat-stream chat-stream--light"></div>
+            <form id="master-chat-form" class="chat-form">
+              <input id="master-chat-input" type="text" maxlength="240" placeholder="Type a command..." required />
+              <button class="btn btn--primary" type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+        <p id="master-message" class="panel__message" role="status"></p>
+      </section>
+    </main>
+
+    <template id="queue-item-template">
+      <li class="queue__item">
+        <div>
+          <p class="queue__phase"></p>
+          <p class="queue__meta"></p>
+        </div>
+        <button class="btn btn--ghost btn--small queue__remove" type="button">Remove</button>
+      </li>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
