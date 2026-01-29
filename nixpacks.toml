@@ -4,6 +4,8 @@ providers = ["php"]
 nixPkgs = [
   "php83",
   "php83Extensions.pdo_mysql",
+  "php83Extensions.session",
+  "php83Extensions.openssl",
 ]
 
 [start]
