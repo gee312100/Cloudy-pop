@@ -11,7 +11,7 @@ RUN mkdir -p /docker-entrypoint-initdb.d \
 
 COPY public/ /var/www/html/public/
 COPY api/ /var/www/html/api/
-COPY db/schema.sql /docker-entrypoint-initdb.d/01-schema.sql
+COPY db/ /docker-entrypoint-initdb.d/
 
 EXPOSE 80
 
