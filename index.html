@@ -506,6 +506,7 @@
     const musicUploadEl = el('musicUpload');
 
     const saveSettingsButtonEl = el('saveSettingsButton');
+    const settingsButtonEl = el('settingsButton');
 
     function randint(min, max) {
       min = Math.floor(min);
@@ -1019,11 +1020,19 @@
         saveSettingsToMemory();
       });
 
+      settingsButtonEl.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const modalEl = document.getElementById('settingsModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      });
+
       saveSettingsButtonEl.addEventListener('click', () => {
         if (applySettings()) {
           const modalEl = document.getElementById('settingsModal');
-          const modal = bootstrap.Modal.getInstance(modalEl);
-          if (modal) modal.hide();
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modal.hide();
         }
       });
 

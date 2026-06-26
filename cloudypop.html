@@ -526,6 +526,7 @@ function loadSettingsFromMemory() {
     const delayMaxEl = document.getElementById('delayMax');
     const cyclesEl = document.getElementById('cycles');
     const saveSettingsButtonEl = document.getElementById('saveSettingsButton');
+    const settingsButtonEl = document.getElementById('settingsButton');
 
     // ===== Utility =====
     function randint(min, max) {
@@ -881,12 +882,20 @@ function loadSettingsFromMemory() {
       }
     });
 
+settingsButtonEl.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  const modalEl = document.getElementById('settingsModal');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
+});
+
 saveSettingsButtonEl.addEventListener('click', () => {
   if (applySettings()) {
-    saveSettingsToMemory();  // <-- NEW
+    saveSettingsToMemory();
     const modalEl = document.getElementById('settingsModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) modal.hide();
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.hide();
   }
 });
 
