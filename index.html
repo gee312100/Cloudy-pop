@@ -260,57 +260,67 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Inhale (seconds)</div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="20" value="4" class="form-range" id="inhaleMin">
-                    <small class="text-muted">Min: <span id="inhaleMinVal">4</span>s</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="30" value="6" class="form-range" id="inhaleMax">
-                    <small class="text-muted">Max: <span id="inhaleMaxVal">6</span>s</small>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="inhaleMin">Min</label>
+                      <input type="number" min="1" value="4" class="form-control form-control-sm" id="inhaleMin">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="inhaleMax">Max</label>
+                      <input type="number" min="1" value="6" class="form-control form-control-sm" id="inhaleMax">
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Hold (seconds)</div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="20" value="4" class="form-range" id="holdMin">
-                    <small class="text-muted">Min: <span id="holdMinVal">4</span>s</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="30" value="6" class="form-range" id="holdMax">
-                    <small class="text-muted">Max: <span id="holdMaxVal">6</span>s</small>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="holdMin">Min</label>
+                      <input type="number" min="1" value="4" class="form-control form-control-sm" id="holdMin">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="holdMax">Max</label>
+                      <input type="number" min="1" value="6" class="form-control form-control-sm" id="holdMax">
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Exhale (seconds)</div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="30" value="4" class="form-range" id="exhaleMin">
-                    <small class="text-muted">Min: <span id="exhaleMinVal">4</span>s</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="1" max="40" value="8" class="form-range" id="exhaleMax">
-                    <small class="text-muted">Max: <span id="exhaleMaxVal">8</span>s</small>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="exhaleMin">Min</label>
+                      <input type="number" min="1" value="4" class="form-control form-control-sm" id="exhaleMin">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="exhaleMax">Max</label>
+                      <input type="number" min="1" value="8" class="form-control form-control-sm" id="exhaleMax">
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Break / Rest (seconds)</div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="0" max="20" value="3" class="form-range" id="breakMin">
-                    <small class="text-muted">Min: <span id="breakMinVal">3</span>s</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="0" max="30" value="6" class="form-range" id="breakMax">
-                    <small class="text-muted">Max: <span id="breakMaxVal">6</span>s</small>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="breakMin">Min</label>
+                      <input type="number" min="0" value="3" class="form-control form-control-sm" id="breakMin">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="breakMax">Max</label>
+                      <input type="number" min="0" value="6" class="form-control form-control-sm" id="breakMax">
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="settings-label mb-1">Session start delay (seconds)</div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="0" max="15" value="1" class="form-range" id="delayMin">
-                    <small class="text-muted">Min: <span id="delayMinVal">1</span>s</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="range" min="0" max="20" value="3" class="form-range" id="delayMax">
-                    <small class="text-muted">Max: <span id="delayMaxVal">3</span>s</small>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="delayMin">Min</label>
+                      <input type="number" min="0" value="1" class="form-control form-control-sm" id="delayMin">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0" for="delayMax">Max</label>
+                      <input type="number" min="0" value="3" class="form-control form-control-sm" id="delayMax">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -483,16 +493,6 @@
     const delayMinEl = el('delayMin');
     const delayMaxEl = el('delayMax');
     const cyclesEl = el('cycles');
-    const inhaleMinValEl = el('inhaleMinVal');
-    const inhaleMaxValEl = el('inhaleMaxVal');
-    const holdMinValEl = el('holdMinVal');
-    const holdMaxValEl = el('holdMaxVal');
-    const exhaleMinValEl = el('exhaleMinVal');
-    const exhaleMaxValEl = el('exhaleMaxVal');
-    const breakMinValEl = el('breakMinVal');
-    const breakMaxValEl = el('breakMaxVal');
-    const delayMinValEl = el('delayMinVal');
-    const delayMaxValEl = el('delayMaxVal');
     const cyclesValEl = el('cyclesVal');
     const backgroundColorEl = el('backgroundColor');
     const accentColorEl = el('accentColor');
@@ -506,6 +506,7 @@
     const musicUploadEl = el('musicUpload');
 
     const saveSettingsButtonEl = el('saveSettingsButton');
+    const settingsButtonEl = el('settingsButton');
 
     function randint(min, max) {
       min = Math.floor(min);
@@ -574,16 +575,6 @@
     }
 
     function updateRangeLabels() {
-      inhaleMinValEl.textContent = inhaleMinEl.value;
-      inhaleMaxValEl.textContent = inhaleMaxEl.value;
-      holdMinValEl.textContent = holdMinEl.value;
-      holdMaxValEl.textContent = holdMaxEl.value;
-      exhaleMinValEl.textContent = exhaleMinEl.value;
-      exhaleMaxValEl.textContent = exhaleMaxEl.value;
-      breakMinValEl.textContent = breakMinEl.value;
-      breakMaxValEl.textContent = breakMaxEl.value;
-      delayMinValEl.textContent = delayMinEl.value;
-      delayMaxValEl.textContent = delayMaxEl.value;
       cyclesValEl.textContent = cyclesEl.value;
     }
 
@@ -771,19 +762,6 @@
       } else {
         startNextCycleOrEnd();
       }
-    }
-
-    function advancePhase() {
-      const s = state.settings;
-      const stage = state.currentStage;
-      if (!state.isPlaying) return;
-      if (stage === 'startup') { runDramaticSequence(() => startPhase('inhale', state.pendingDurations.inhale)); }
-      else if (stage === 'dramatic') { startPhase('inhale', state.pendingDurations.inhale); }
-      else if (stage === 'inhale') { startPhase('hold', state.pendingDurations.hold); }
-      else if (stage === 'hold') { startPhase('exhale', state.pendingDurations.exhale); }
-      else if (stage === 'exhale') { startBreakOrNext(); }
-      else if (stage === 'break') { startNextCycleOrEnd(); }
-      else { startNextCycleOrEnd(); }
     }
 
     function startNextCycleOrEnd() {
@@ -1019,11 +997,19 @@
         saveSettingsToMemory();
       });
 
+      settingsButtonEl.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const modalEl = document.getElementById('settingsModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      });
+
       saveSettingsButtonEl.addEventListener('click', () => {
         if (applySettings()) {
           const modalEl = document.getElementById('settingsModal');
-          const modal = bootstrap.Modal.getInstance(modalEl);
-          if (modal) modal.hide();
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modal.hide();
         }
       });
 
